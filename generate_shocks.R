@@ -46,17 +46,26 @@ structs02 <- structs |>
 structs$industria_quimica_plasticos |>
   write_tsv("estructura_quimica.tsv")
 
-
 splitsQ <- read_tsv("splits_sin.tsv")
+Order_by <- factor(splitsQ$sector)
+
+
+x <- factor(Sc("medium", "low", "high", "medium"),
+            levels = c("low", "medium", "high"),
+            ordered = TRUE)
+
+
+TemplateS <- read_tsv("data/shocks_template.tsv")
+TemplateS$sector[1:35]
+factor(splitsQ, levels = TemplateS$sector[1:35])
+
+shocksQ <- sin_out_splitsQ * SH_CONS
+
 
 sin_out_splitsQ <- c(splitsQ$sin, splitsQ$out) * c(
   structs$industria_quimica_plasticos$tot,
   structs$industria_quimica_plasticos$tot
 )
-
-shocksQ <- sin_out_splitsQ * SH_CONS
-
-TemplateS <- read_tsv("data/shocks_template.tsv")
 
 shocksReady <- TemplateS |>
   select(-shock_01, -shock_02) |>
