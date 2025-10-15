@@ -1,7 +1,7 @@
 empleos	formales	informales	sector	region	scian
 126459	41712	84747	agricultura	sinaloa	111
 32820.5	8682.75	24137.75	explotacion_animal	sinaloa	112
-6719	1045	5674	agropecuario_forestal	sinaloa	113:115
+6719	1045	5674	agropecuario_forestal	sinaloa	113,115
 13128.75	2399.5	10729.25	pesca_caza	sinaloa	114
 133.5	133.5	0	mineria_petrolera	sinaloa	211
 6979	4955.25	2023.75	mineria_no_petrolera	sinaloa	212
@@ -37,7 +37,7 @@ empleos	formales	informales	sector	region	scian
 10177.25	555.75	9621.5	NA	sinaloa	NA
 5257087	694651	4562436	agricultura	fuera_sinaloa	111
 783674.5	193496.75	590177.75	explotacion_animal	fuera_sinaloa	112
-108579.25	20815.25	87764	agropecuario_forestal	fuera_sinaloa	113:115
+108579.25	20815.25	87764	agropecuario_forestal	fuera_sinaloa	113,115
 93583.75	15675.5	77908.25	pesca_caza	fuera_sinaloa	114
 35957.25	35234	723.25	mineria_petrolera	fuera_sinaloa	211
 169702.5	134041.25	35661.25	mineria_no_petrolera	fuera_sinaloa	212
