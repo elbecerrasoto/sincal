@@ -16,7 +16,9 @@ MIP <- "data/mip_sinaloa.tsv"
 EMPLOYMENT <- "data/empleo_sinaloa.tsv"
 ORI_DEST <- "data/origen_destino.rds"
 
-SECTORS <- read_tsv("data/empleo_sinaloa.tsv")$sector |> unique()
+EMPLOYMENT_TIBBLE <- read_tsv(EMPLOYMENT) |>
+  filter(!is.na(sector))
+SECTORS <- EMPLOYMENT_TIBBLE$sector |> unique()
 
 stopifnot(
   "Unrecognized input sector" =
@@ -51,18 +53,17 @@ get_employment_matrices <- function(employment) {
     set_names(etype)
 }
 
-# ---- read data
+# ---- main
 
 sinaloa <- read_tsv(MIP) |>
   get_ZAB_LG_fx_Madds()
 
-Tsin_all <- read_tsv(EMPLOYMENT) |>
-  filter(!is.na(sector)) |>
+Tsin_all <- EMPLOYMENT_TIBBLE |>
   get_employment_matrices()
 
 sector_structure <- read_rds(ORI_DEST) |>
   get_sector_structure() |>
-  set_names(SECTORS)
+  `colnames<-`(SECTORS)
 
 # ---- multipliers
 
