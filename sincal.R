@@ -53,7 +53,7 @@ get_employment_matrices <- function(employment) {
     set_names(etype)
 }
 
-# ---- main
+# ---- key data
 
 sinaloa <- read_tsv(MIP) |>
   get_ZAB_LG_fx_Madds()
@@ -61,9 +61,63 @@ sinaloa <- read_tsv(MIP) |>
 Tsin_all <- EMPLOYMENT_TIBBLE |>
   get_employment_matrices()
 
-sector_structure <- read_rds(ORI_DEST) |>
+sectors_structure <- read_rds(ORI_DEST) |>
   get_sector_structure() |>
   `colnames<-`(SECTORS)
+
+cs <- colSums(sectors_structure)
+stopifnot(
+  "structure calculation failed" =
+    all(near(cs, 1) | near(cs, 0))
+)
+
+
+# ---- manipulations
+
+split_vec <- c(
+  rep(1, 35),
+  rep(0, 35)
+)
+
+input_sector_structure <-
+  sectors_structure[, which(SECTORS %in% INPUT_SECTOR), drop = TRUE] |>
+  rep(2)
+
+shocks <- input_sector_structure * split_vec * INVESTMENT_MILLIONS_MXN
+
+# into an assert
+near(sum(shocks), INVESTMENT_MILLIONS_MXN)
+
+#
+# effects_pib <- shocks70 |>
+#   select(starts_with(SHOCK_MARK)) |>
+#   map(\(sh) as.double(sinaloa$L %*% sh)) |>
+#   as_tibble()
+#
+# new_names <- str_c(names(effects_pib), "_pib")
+# effects_pib <- set_names(effects_pib, new_names)
+#
+# Leffects_employment <- vector(mode = "list", length = 3)
+# for (Ttype in names(Tsin)) {
+#   Tm <- Tsin[[Ttype]]
+#   i_effects <- shocks70 |>
+#     select(starts_with(SHOCK_MARK)) |>
+#     map(\(sh) as.double(Tm %*% sh))
+#   new_names <- str_c(names(i_effects), "_", Ttype)
+#
+#   i_effects <- i_effects |>
+#     set_names(new_names) |>
+#     as_tibble()
+#
+#   Leffects_employment[[Ttype]] <- i_effects
+# }
+# effects_employment <- bind_cols(Leffects_employment)
+#
+# results <- shocks70 |>
+#   select(!starts_with(SHOCK_MARK)) |>
+#   bind_cols(effects_pib, effects_employment)
+
+
 
 # ---- multipliers
 
