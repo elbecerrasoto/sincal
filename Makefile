@@ -1,3 +1,8 @@
+.PHONY: all
+all:
+	Rscript sincal.R
+
+
 .PHONY: help
 help:
 	cat Makefile
