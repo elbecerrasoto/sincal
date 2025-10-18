@@ -4,13 +4,27 @@ source("helper.R")
 
 # ---- globals
 
+INPUT_SECTOR <- "industria_quimica_plasticos"
+INVESTMENT_USD <- 1681978e3
+
+USD_MXN <- 18.50
+MIP_SCALE <- 1e6
+
+INVESTMENT_MILLIONS_MXN <- USD_MXN * INVESTMENT_USD / MIP_SCALE
+
 MIP <- "data/mip_sinaloa.tsv"
 EMPLOYMENT <- "data/empleo_sinaloa.tsv"
 ORI_DEST <- "data/origen_destino.rds"
 
-OUTPUT_DIR <- "results"
-OUTPUT_TAB <- glue("{OUTPUT_DIR}/results.tsv")
+SECTORS <- read_tsv("data/empleo_sinaloa.tsv")$sector |> unique()
 
+stopifnot(
+  "Unrecognized input sector" =
+    INPUT_SECTOR %in% SECTORS
+)
+
+OUTPUT_DIR <- "results"
+OUTPUT_TAB <- glue("{OUTPUT_DIR}/{INPUT_SECTOR}.tsv")
 
 # ---- helpers
 
@@ -30,32 +44,25 @@ get_sector_structure <- function(origen_destino_all) {
   apply(origen_destino, 2, relative_buys)
 }
 
+get_employment_matrices <- function(employment) {
+  etype <- c("empleos", "formales", "informales")
+  employment[etype] |>
+    map(get_T, L = sinaloa$L, x = sinaloa$x) |>
+    set_names(etype)
+}
+
 # ---- read data
 
 sinaloa <- read_tsv(MIP) |>
   get_ZAB_LG_fx_Madds()
 
-employment <- read_tsv(EMPLOYMENT) |>
-  filter(!is.na(sector))
+Tsin_all <- read_tsv(EMPLOYMENT) |>
+  filter(!is.na(sector)) |>
+  get_employment_matrices()
 
-SECTORS <- unique(employment$sector)
-
-origen_destino_all <- read_rds(ORI_DEST)
-
-# ---- employment
-
-# Calculate employment matrices
-etype <- c("empleos", "formales", "informales")
-
-Tsin <- employment[etype] |>
-  map(get_T, L = sinaloa$L, x = sinaloa$x)
-
-Tsin <- set_names(Tsin, etype)
-
-# ---- sector structure
-
-sector_structure <- get_sector_structure(origen_destino_all)
-colnames(sector_structure) <- SECTORS
+sector_structure <- read_rds(ORI_DEST) |>
+  get_sector_structure() |>
+  set_names(SECTORS)
 
 # ---- multipliers
 
@@ -66,4 +73,5 @@ colnames(sector_structure) <- SECTORS
 
 # ---- write output
 
+# dir.create("path", recursive = TRUE)
 # write_tsv(results, OUTPUT)
