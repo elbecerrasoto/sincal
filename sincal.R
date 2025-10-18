@@ -67,7 +67,7 @@ sectors_structure <- read_rds(ORI_DEST) |>
 
 cs <- colSums(sectors_structure)
 stopifnot(
-  "structure calculation failed" =
+  "Structure calculation has failed." =
     all(near(cs, 1) | near(cs, 0))
 )
 
@@ -86,47 +86,39 @@ input_sector_structure <-
 shocks <- input_sector_structure * split_vec * INVESTMENT_MILLIONS_MXN
 
 # into an assert
-near(sum(shocks), INVESTMENT_MILLIONS_MXN)
+stopifnot(
+  "Error with investment shocks." =
+    near(sum(shocks), INVESTMENT_MILLIONS_MXN)
+)
 
-#
-# effects_pib <- shocks70 |>
-#   select(starts_with(SHOCK_MARK)) |>
-#   map(\(sh) as.double(sinaloa$L %*% sh)) |>
-#   as_tibble()
-#
-# new_names <- str_c(names(effects_pib), "_pib")
-# effects_pib <- set_names(effects_pib, new_names)
-#
-# Leffects_employment <- vector(mode = "list", length = 3)
-# for (Ttype in names(Tsin)) {
-#   Tm <- Tsin[[Ttype]]
-#   i_effects <- shocks70 |>
-#     select(starts_with(SHOCK_MARK)) |>
-#     map(\(sh) as.double(Tm %*% sh))
-#   new_names <- str_c(names(i_effects), "_", Ttype)
-#
-#   i_effects <- i_effects |>
-#     set_names(new_names) |>
-#     as_tibble()
-#
-#   Leffects_employment[[Ttype]] <- i_effects
-# }
-# effects_employment <- bind_cols(Leffects_employment)
-#
-# results <- shocks70 |>
-#   select(!starts_with(SHOCK_MARK)) |>
-#   bind_cols(effects_pib, effects_employment)
+pib <- sinaloa$L %*% shocks |> as.double()
+empleos <- map(Tsin_all, \(M) M %*% shocks |> as.double()) |>
+  as_tibble()
 
-
+results <- empleos |>
+  mutate(pib = pib)
 
 # ---- multipliers
 
-# results$directos <- rep(1, N_SECTORS) # direct
-# results$indirectos <- colSums(sinaloa$M1a) # indirect
-# results$desbordamiento <- colSums(sinaloa$M2a) # spillover
-# results$retroalimentacion <- colSums(sinaloa$M3a) # feedback
+did <- tibble(
+  directos = rep(1, N_SECTORS),
+  indirectos = colSums(sinaloa$M1a),
+  desbordamiento = colSums(sinaloa$M2a),
+  retroalimentacion = colSums(sinaloa$M3a))
+
+row_totals <- rowSums(did)
+
+did <- did |>
+  mutate(Rdirectos = directos / row_totals,
+         Rindirectos = indirectos / row_totals,
+         Rdesbordamiento = desbordamiento / row_totals,
+         Rretoalimentacion = retroalimentacion / row_totals)
+
+EMPLOYMENT_TIBBLE |>
+  select(sector, region, scian) |>
+  bind_cols(results)
 
 # ---- write output
 
-# dir.create("path", recursive = TRUE)
-# write_tsv(results, OUTPUT)
+dir.create("path", recursive = TRUE)
+write_tsv(results, OUTPUT)
