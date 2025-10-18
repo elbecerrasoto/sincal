@@ -26,7 +26,7 @@ stopifnot(
 )
 
 OUTPUT_DIR <- "results"
-OUTPUT_TAB <- glue("{OUTPUT_DIR}/{INPUT_SECTOR}.tsv")
+OUTPUT <- glue("{OUTPUT_DIR}/{INPUT_SECTOR}.tsv")
 
 # ---- helpers
 
@@ -71,8 +71,7 @@ stopifnot(
     all(near(cs, 1) | near(cs, 0))
 )
 
-
-# ---- manipulations
+# ---- results
 
 split_vec <- c(
   rep(1, 35),
@@ -85,7 +84,6 @@ input_sector_structure <-
 
 shocks <- input_sector_structure * split_vec * INVESTMENT_MILLIONS_MXN
 
-# into an assert
 stopifnot(
   "Error with investment shocks." =
     near(sum(shocks), INVESTMENT_MILLIONS_MXN)
@@ -98,27 +96,40 @@ empleos <- map(Tsin_all, \(M) M %*% shocks |> as.double()) |>
 results <- empleos |>
   mutate(pib = pib)
 
-# ---- multipliers
+# ---- biregional effects
 
 did <- tibble(
   directos = rep(1, N_SECTORS),
   indirectos = colSums(sinaloa$M1a),
   desbordamiento = colSums(sinaloa$M2a),
-  retroalimentacion = colSums(sinaloa$M3a))
+  retroalimentacion = colSums(sinaloa$M3a)
+)
 
 row_totals <- rowSums(did)
 
 did <- did |>
-  mutate(Rdirectos = directos / row_totals,
-         Rindirectos = indirectos / row_totals,
-         Rdesbordamiento = desbordamiento / row_totals,
-         Rretoalimentacion = retroalimentacion / row_totals)
+  mutate(across(
+    everything(),
+    \(x) x / row_totals
+  ))
 
-EMPLOYMENT_TIBBLE |>
+breffects <- imap(
+  did,
+  function(x, i) {
+    results |>
+      mutate(across(
+        everything(),
+        ~ .x * x
+      )) |>
+      rename_with(~ paste0(i, "_", .x))
+  }
+)
+
+results_breffects <- EMPLOYMENT_TIBBLE |>
   select(sector, region, scian) |>
-  bind_cols(results)
+  bind_cols(results, breffects)
 
 # ---- write output
 
-dir.create("path", recursive = TRUE)
-write_tsv(results, OUTPUT)
+dir.create(OUTPUT_DIR, recursive = TRUE)
+write_tsv(results_breffects, OUTPUT)
