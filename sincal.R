@@ -102,7 +102,7 @@ pib <- sinaloa$L %*% shocks |> as.double()
 empleos <- map(Tsin_all, \(M) M %*% shocks |> as.double()) |>
   as_tibble()
 
-results <- empleos |>
+raw_results <- empleos |>
   mutate(pib = pib)
 
 # ---- biregional effects
@@ -125,7 +125,7 @@ did <- did |>
 breffects <- imap(
   did,
   function(x, i) {
-    results |>
+    raw_results |>
       mutate(across(
         everything(),
         ~ .x * x
@@ -134,27 +134,23 @@ breffects <- imap(
   }
 )
 
-results_breffects <- EMPLOYMENT_TIBBLE |>
-  select(sector, region, scian) |>
-  bind_cols(results, breffects)
+# ---- structure output
 
+results <- tibble(
+  input_sector = INPUT_SECTOR,
+  investment_usd = INVESTMENT_USD,
+  exrate = USD_MXN,
+  input_sector_structure = input_sector_structure,
+  split = splits_vec,
+  shocks_millones_mxn = shocks
+)
 
-results_breffects$input_sector <- INPUT_SECTOR
-results_breffects$investment_usd <- INVESTMENT_USD
-results_breffects$exrate <- USD_MXN
-results_breffects$input_sector_structure <- input_sector_structure
-results_breffects$split <- splits_vec
+sector_info <- EMPLOYMENT_TIBBLE |>
+  select(sector, region, scian)
 
-results_breffects <- results_breffects |>
-  relocate(
-    input_sector,
-    investment_usd,
-    exrate,
-    input_sector_structure,
-    split
-  )
+results <- bind_cols(results, sector_info, raw_results, breffects)
 
 # ---- write output
 
 dir.create(OUTPUT_DIR, recursive = TRUE)
-write_tsv(results_breffects, OUTPUT)
+write_tsv(results, OUTPUT)
