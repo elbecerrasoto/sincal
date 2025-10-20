@@ -13,8 +13,9 @@ MIP_SCALE <- 1e6
 INVESTMENT_MILLIONS_MXN <- USD_MXN * INVESTMENT_USD / MIP_SCALE
 
 MIP <- "data/mip_sinaloa.tsv"
-EMPLOYMENT <- "data/empleo_sinaloa.tsv"
+EMPLOYMENT <- "data/empleos_impuestos.tsv"
 ORI_DEST <- "data/origen_destino.rds"
+SPLITS <- "data/splits.tsv"
 
 EMPLOYMENT_TIBBLE <- read_tsv(EMPLOYMENT) |>
   filter(!is.na(sector))
@@ -47,7 +48,7 @@ get_sector_structure <- function(origen_destino_all) {
 }
 
 get_employment_matrices <- function(employment) {
-  etype <- c("empleos", "formales", "informales")
+  etype <- c("empleos", "formales", "informales", "impuestos", "valor_bruto")
   employment[etype] |>
     map(get_T, L = sinaloa$L, x = sinaloa$x) |>
     set_names(etype)
@@ -71,18 +72,26 @@ stopifnot(
     all(near(cs, 1) | near(cs, 0))
 )
 
+splits <- read_tsv(SPLITS)
+
+splits_sums <- splits |>
+  select(sin, out) |>
+  rowSums()
+
+stopifnot(
+  "Splits don't sum up to 1." =
+    all(near(splits_sums, 1))
+)
+
 # ---- results
 
-split_vec <- c(
-  rep(1, 35),
-  rep(0, 35)
-)
+splits_vec <- c(splits$sin, splits$out)
 
 input_sector_structure <-
   sectors_structure[, which(SECTORS %in% INPUT_SECTOR), drop = TRUE] |>
   rep(2)
 
-shocks <- input_sector_structure * split_vec * INVESTMENT_MILLIONS_MXN
+shocks <- input_sector_structure * splits_vec * INVESTMENT_MILLIONS_MXN
 
 stopifnot(
   "Error with investment shocks." =
