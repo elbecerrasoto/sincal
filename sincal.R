@@ -138,6 +138,22 @@ results_breffects <- EMPLOYMENT_TIBBLE |>
   select(sector, region, scian) |>
   bind_cols(results, breffects)
 
+
+results_breffects$input_sector <- INPUT_SECTOR
+results_breffects$investment_usd <- INVESTMENT_USD
+results_breffects$exrate <- USD_MXN
+results_breffects$input_sector_structure <- input_sector_structure
+results_breffects$split <- splits_vec
+
+results_breffects <- results_breffects |>
+  relocate(
+    input_sector,
+    investment_usd,
+    exrate,
+    input_sector_structure,
+    split
+  )
+
 # ---- write output
 
 dir.create(OUTPUT_DIR, recursive = TRUE)
