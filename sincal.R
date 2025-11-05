@@ -48,7 +48,7 @@ get_sector_structure <- function(origen_destino_all) {
 }
 
 get_employment_matrices <- function(employment) {
-  etype <- c("empleos", "formales", "informales", "impuestos", "valor_bruto")
+  etype <- names(employment)[4:length(employment)]
   employment[etype] |>
     map(get_T, L = sinaloa$L, x = sinaloa$x) |>
     set_names(etype)

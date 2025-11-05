@@ -1,4 +1,4 @@
-#/usr/bin/env Rcript
+# /usr/bin/env Rcript
 library(tidyverse)
 library(readxl)
 library(janitor)
@@ -30,16 +30,16 @@ read_origen_destino <- function(path) {
   x <- read_xlsx(path, col_names = FALSE) |>
     slice_tail(n = -SKIP_ABOVE) |>
     slice_head(n = -SKIP_BELOW)
-  
+
   sectors <- x[[1]] |>
     janitor::make_clean_names()
-  
+
   x <- x[, -(1:2)] |>
     mutate(across(everything(), ~ as.double(.x)))
-  
+
   x <- x |>
     set_names(sectors)
-  
+
   x |> as.matrix()
 }
 
@@ -50,22 +50,22 @@ collapse_matrix <- function(M, mapped) {
       \(i) M[, i]
     ), `+`)
   }
-  
+
   reduce_rows <- function(M, idxs) {
     reduce(map(
       idxs,
       \(i) M[i, ]
     ), `+`)
   }
-  
+
   col_reduced <- map(mapped, \(idxs)
-                     reduce_cols(M, idxs)) %>%
+  reduce_cols(M, idxs)) %>%
     do.call(cbind, .)
-  
+
   row_reduced <- map(mapped, \(idxs)
-                     reduce_rows(col_reduced, idxs)) %>%
+  reduce_rows(col_reduced, idxs)) %>%
     do.call(rbind, .)
-  
+
   row_reduced
 }
 
@@ -87,9 +87,3 @@ mapped <- set_names(mapped, unique(map_ori_bir$scian_bir))
 
 all_collapsed <- map(ALL, \(M) collapse_matrix(M, mapped))
 write_rds(all_collapsed, OUT)
-
-
-
-
-
-
