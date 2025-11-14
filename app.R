@@ -11,6 +11,36 @@ SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
 
+ORI_DEST <- "data/origen_destino.rds"
+
+get_sector_structure <- function(origen_destino_all) {
+  origen_destino <- reduce(origen_destino_all, `+`)
+  origen_destino[origen_destino < 0] <- 0
+
+  relative_buys <- function(col) {
+    total <- sum(col)
+    if (total > 0) {
+      col / total
+    } else {
+      return(rep(0, length(col)))
+    }
+  }
+
+  apply(origen_destino, 2, relative_buys)
+}
+
+SECTORS_STRUCTURE <- read_rds(ORI_DEST) |>
+  get_sector_structure() |>
+  `colnames<-`(SECTORS)
+
+cs <- colSums(SECTORS_STRUCTURE)
+stopifnot(
+  "Structure calculation has failed." =
+    all(near(cs, 1) | near(cs, 0))
+)
+
+
+
 # UI helpers ----
 
 select_mode <- radioButtons("template_mode",
@@ -43,6 +73,7 @@ ui <- fluidPage(
   textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", MXN_USD, min = 0),
   mode_params,
+  verbatimTextOutput("non_zero"),
   dataTableOutput("template_tab")
 )
 
@@ -64,6 +95,7 @@ server <- function(input, output) {
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio
         )
+      out$origen_destino_structure <- rep(SECTORS_STRUCTURE[, input$oridest_sector], 2)
     } else {
       out <- TEMPLATE |>
         mutate(
@@ -79,7 +111,12 @@ server <- function(input, output) {
     out
   })
 
+  non_zero_sectors <- reactive({
+    bmask <- !near(SECTORS_STRUCTURE[, input$oridest_sector], 0.0)
+    SECTORS[bmask]
+  })
 
+  output$non_zero <- renderText(non_zero_sectors())
   output$template_tab <- renderDataTable(template())
 }
 
