@@ -54,15 +54,29 @@ server <- function(input, output) {
   })
 
   template <- reactive({
-    TEMPLATE |>
-      mutate(
-        experiment_name = input$experiment_name,
-        date = Sys.time(),
-        use_origen_destino = input$template_mode == MODE_ORIDEST,
-        origen_destino_sector = input$oridest_sector,
-        investment_usd = input$oridest_invest,
-        exrate = input$tipo_cambio
-      )
+    if (input$template_mode == MODE_ORIDEST) {
+      out <- TEMPLATE |>
+        mutate(
+          experiment_name = input$experiment_name,
+          date = Sys.time(),
+          use_origen_destino = input$template_mode == MODE_ORIDEST,
+          origen_destino_sector = input$oridest_sector,
+          investment_usd = input$oridest_invest,
+          exrate = input$tipo_cambio
+        )
+    } else {
+      out <- TEMPLATE |>
+        mutate(
+          experiment_name = input$experiment_name,
+          date = Sys.time(),
+          use_origen_destino = input$template_mode == MODE_ORIDEST,
+          origen_destino_sector = NA,
+          investment_usd = NA,
+          exrate = input$tipo_cambio
+        )
+    }
+
+    out
   })
 
 
