@@ -1,23 +1,23 @@
 library(shiny)
-source("ui_helper.R")
+library(tidyverse)
 
+TEMPLATE <- read_tsv("data/input_base.tsv")
 
-controls_oridest <- list()
-controls_shocks <- list()
-
-
+MXN_USD <- 18.5
+DATE <- Sys.Date() # later make it reactive upon everything
+TEMPLATE$date <- DATE
+SECTORS <- unique(TEMPLATE$sector)
 
 mode_params <- tabsetPanel(
   id = "mode_params",
   type = "hidden",
   tabPanel(
     "mode_oridest",
-    numericInput("mean1", "mean", value = 1),
-    numericInput("mean2", "mean", value = 1)
+    selectInput("oridest_sector", "Selecciona el sector:", SECTORS),
+    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", 0)
   ),
   tabPanel(
-    "mode_shocks",
-    numericInput("mean3", "mean", value = 1)
+    "mode_shocks"
   ),
 )
 
@@ -34,6 +34,8 @@ select_mode <- radioButtons("template_mode",
 
 ui <- fluidPage(
   select_mode,
+  textInput("experimento", "Nombre del Experimento"),
+  numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD),
   mode_params
 )
 
