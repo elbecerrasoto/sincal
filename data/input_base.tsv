@@ -1,71 +1,71 @@
-experiment_name	use_origen_destino	origen_destino_sector	origen_destino_structure	split	investment_usd	exrate	shocks_millones_mxn	sector	region	scian
-test	FALSE	NA	NA	NA	1681978000	18.5	0	agricultura	sinaloa	111
-test	FALSE	NA	NA	NA	1681978000	18.5	0	explotacion_animal	sinaloa	112
-test	FALSE	NA	NA	NA	1681978000	18.5	0	agropecuario_forestal	sinaloa	113115
-test	FALSE	NA	NA	NA	1681978000	18.5	0	pesca_caza	sinaloa	114
-test	FALSE	NA	NA	NA	1681978000	18.5	0	mineria_petrolera	sinaloa	211
-test	FALSE	NA	NA	NA	1681978000	18.5	0	mineria_no_petrolera	sinaloa	212
-test	FALSE	NA	NA	NA	1681978000	18.5	0	energia_electrica_agua_gas	sinaloa	22
-test	FALSE	NA	NA	NA	1681978000	18.5	23392.0488604259	construccion	sinaloa	23
-test	FALSE	NA	NA	NA	1681978000	18.5	0	industria_alimentaria	sinaloa	311
-test	FALSE	NA	NA	NA	1681978000	18.5	0	bebidas_tabaco	sinaloa	312
-test	FALSE	NA	NA	NA	1681978000	18.5	3.73038740055689	textiles_excepto_prendas	sinaloa	313-314
-test	FALSE	NA	NA	NA	1681978000	18.5	0	prendas_cuero_piel	sinaloa	315-316
-test	FALSE	NA	NA	NA	1681978000	18.5	0	madera	sinaloa	321
-test	FALSE	NA	NA	NA	1681978000	18.5	0	papel	sinaloa	322-323
-test	FALSE	NA	NA	NA	1681978000	18.5	0	industria_quimica_plasticos	sinaloa	324-326
-test	FALSE	NA	NA	NA	1681978000	18.5	0.136940945380103	industria_minerales_no_metalicos	sinaloa	327
-test	FALSE	NA	NA	NA	1681978000	18.5	220.324071266491	industrias_metalicas	sinaloa	331-332
-test	FALSE	NA	NA	NA	1681978000	18.5	493.006889031442	maquinaria_equipo_electronicos	sinaloa	333-336
-test	FALSE	NA	NA	NA	1681978000	18.5	243.34598450554	muebles_colchones_persianas	sinaloa	337
-test	FALSE	NA	NA	NA	1681978000	18.5	0	otras_industrias	sinaloa	339
-test	FALSE	NA	NA	NA	1681978000	18.5	0	comercio_al_por_mayor	sinaloa	43
-test	FALSE	NA	NA	NA	1681978000	18.5	0	comercio_al_por_menor	sinaloa	46
-test	FALSE	NA	NA	NA	1681978000	18.5	0	logistica	sinaloa	48-49
-test	FALSE	NA	NA	NA	1681978000	18.5	0	medios_masivos	sinaloa	51
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_financieros	sinaloa	52
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_inmobiliarios	sinaloa	53
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_profesionales	sinaloa	54
-test	FALSE	NA	NA	NA	1681978000	18.5	90.7385334613283	corporativos	sinaloa	55
-test	FALSE	NA	NA	NA	1681978000	18.5	0	serivicios_manejo_de_residuos	sinaloa	56
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_educativos	sinaloa	61
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_salud	sinaloa	62
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_recreativos	sinaloa	71
-test	FALSE	NA	NA	NA	1681978000	18.5	0	hoteleria_restaurants	sinaloa	72
-test	FALSE	NA	NA	NA	1681978000	18.5	0	otros_servicios_excepto_gubernamentales	sinaloa	81
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_gubernamentales	sinaloa	93
-test	FALSE	NA	NA	NA	1681978000	18.5	0	agricultura	fuera_sinaloa	111
-test	FALSE	NA	NA	NA	1681978000	18.5	0	explotacion_animal	fuera_sinaloa	112
-test	FALSE	NA	NA	NA	1681978000	18.5	0	agropecuario_forestal	fuera_sinaloa	113115
-test	FALSE	NA	NA	NA	1681978000	18.5	0	pesca_caza	fuera_sinaloa	114
-test	FALSE	NA	NA	NA	1681978000	18.5	0	mineria_petrolera	fuera_sinaloa	211
-test	FALSE	NA	NA	NA	1681978000	18.5	0	mineria_no_petrolera	fuera_sinaloa	212
-test	FALSE	NA	NA	NA	1681978000	18.5	0	energia_electrica_agua_gas	fuera_sinaloa	22
-test	FALSE	NA	NA	NA	1681978000	18.5	0	construccion	fuera_sinaloa	23
-test	FALSE	NA	NA	NA	1681978000	18.5	0	industria_alimentaria	fuera_sinaloa	311
-test	FALSE	NA	NA	NA	1681978000	18.5	0	bebidas_tabaco	fuera_sinaloa	312
-test	FALSE	NA	NA	NA	1681978000	18.5	8.70423726796607	textiles_excepto_prendas	fuera_sinaloa	313-314
-test	FALSE	NA	NA	NA	1681978000	18.5	0	prendas_cuero_piel	fuera_sinaloa	315-316
-test	FALSE	NA	NA	NA	1681978000	18.5	0	madera	fuera_sinaloa	321
-test	FALSE	NA	NA	NA	1681978000	18.5	0	papel	fuera_sinaloa	322-323
-test	FALSE	NA	NA	NA	1681978000	18.5	0	industria_quimica_plasticos	fuera_sinaloa	324-326
-test	FALSE	NA	NA	NA	1681978000	18.5	1.23246850842093	industria_minerales_no_metalicos	fuera_sinaloa	327
-test	FALSE	NA	NA	NA	1681978000	18.5	1982.91664139842	industrias_metalicas	fuera_sinaloa	331-332
-test	FALSE	NA	NA	NA	1681978000	18.5	4437.06200128298	maquinaria_equipo_electronicos	fuera_sinaloa	333-336
-test	FALSE	NA	NA	NA	1681978000	18.5	243.34598450554	muebles_colchones_persianas	fuera_sinaloa	337
-test	FALSE	NA	NA	NA	1681978000	18.5	0	otras_industrias	fuera_sinaloa	339
-test	FALSE	NA	NA	NA	1681978000	18.5	0	comercio_al_por_mayor	fuera_sinaloa	43
-test	FALSE	NA	NA	NA	1681978000	18.5	0	comercio_al_por_menor	fuera_sinaloa	46
-test	FALSE	NA	NA	NA	1681978000	18.5	0	logistica	fuera_sinaloa	48-49
-test	FALSE	NA	NA	NA	1681978000	18.5	0	medios_masivos	fuera_sinaloa	51
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_financieros	fuera_sinaloa	52
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_inmobiliarios	fuera_sinaloa	53
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_profesionales	fuera_sinaloa	54
-test	FALSE	NA	NA	NA	1681978000	18.5	0	corporativos	fuera_sinaloa	55
-test	FALSE	NA	NA	NA	1681978000	18.5	0	serivicios_manejo_de_residuos	fuera_sinaloa	56
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_educativos	fuera_sinaloa	61
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_salud	fuera_sinaloa	62
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_recreativos	fuera_sinaloa	71
-test	FALSE	NA	NA	NA	1681978000	18.5	0	hoteleria_restaurants	fuera_sinaloa	72
-test	FALSE	NA	NA	NA	1681978000	18.5	0	otros_servicios_excepto_gubernamentales	fuera_sinaloa	81
-test	FALSE	NA	NA	NA	1681978000	18.5	0	servicios_gubernamentales	fuera_sinaloa	93
+experiment_name	date	use_origen_destino	origen_destino_sector	origen_destino_structure	split	investment_usd	exrate	shocks_millones_mxn	sector	region	scian
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	agricultura	sinaloa	111
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	explotacion_animal	sinaloa	112
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	agropecuario_forestal	sinaloa	113115
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	pesca_caza	sinaloa	114
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	mineria_petrolera	sinaloa	211
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	mineria_no_petrolera	sinaloa	212
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	energia_electrica_agua_gas	sinaloa	22
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	construccion	sinaloa	23
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_alimentaria	sinaloa	311
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	bebidas_tabaco	sinaloa	312
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	textiles_excepto_prendas	sinaloa	313-314
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	prendas_cuero_piel	sinaloa	315-316
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	madera	sinaloa	321
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	papel	sinaloa	322-323
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_quimica_plasticos	sinaloa	324-326
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_minerales_no_metalicos	sinaloa	327
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industrias_metalicas	sinaloa	331-332
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	maquinaria_equipo_electronicos	sinaloa	333-336
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	muebles_colchones_persianas	sinaloa	337
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	otras_industrias	sinaloa	339
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	comercio_al_por_mayor	sinaloa	43
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	comercio_al_por_menor	sinaloa	46
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	logistica	sinaloa	48-49
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	medios_masivos	sinaloa	51
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_financieros	sinaloa	52
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_inmobiliarios	sinaloa	53
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_profesionales	sinaloa	54
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	corporativos	sinaloa	55
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	serivicios_manejo_de_residuos	sinaloa	56
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_educativos	sinaloa	61
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_salud	sinaloa	62
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_recreativos	sinaloa	71
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	hoteleria_restaurants	sinaloa	72
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	otros_servicios_excepto_gubernamentales	sinaloa	81
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_gubernamentales	sinaloa	93
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	agricultura	fuera_sinaloa	111
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	explotacion_animal	fuera_sinaloa	112
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	agropecuario_forestal	fuera_sinaloa	113115
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	pesca_caza	fuera_sinaloa	114
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	mineria_petrolera	fuera_sinaloa	211
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	mineria_no_petrolera	fuera_sinaloa	212
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	energia_electrica_agua_gas	fuera_sinaloa	22
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	construccion	fuera_sinaloa	23
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_alimentaria	fuera_sinaloa	311
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	bebidas_tabaco	fuera_sinaloa	312
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	textiles_excepto_prendas	fuera_sinaloa	313-314
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	prendas_cuero_piel	fuera_sinaloa	315-316
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	madera	fuera_sinaloa	321
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	papel	fuera_sinaloa	322-323
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_quimica_plasticos	fuera_sinaloa	324-326
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industria_minerales_no_metalicos	fuera_sinaloa	327
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	industrias_metalicas	fuera_sinaloa	331-332
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	maquinaria_equipo_electronicos	fuera_sinaloa	333-336
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	muebles_colchones_persianas	fuera_sinaloa	337
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	otras_industrias	fuera_sinaloa	339
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	comercio_al_por_mayor	fuera_sinaloa	43
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	comercio_al_por_menor	fuera_sinaloa	46
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	logistica	fuera_sinaloa	48-49
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	medios_masivos	fuera_sinaloa	51
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_financieros	fuera_sinaloa	52
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_inmobiliarios	fuera_sinaloa	53
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_profesionales	fuera_sinaloa	54
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	corporativos	fuera_sinaloa	55
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	serivicios_manejo_de_residuos	fuera_sinaloa	56
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_educativos	fuera_sinaloa	61
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_salud	fuera_sinaloa	62
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_recreativos	fuera_sinaloa	71
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	hoteleria_restaurants	fuera_sinaloa	72
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	otros_servicios_excepto_gubernamentales	fuera_sinaloa	81
+test	NA	FALSE	NA	NA	NA	NA	NA	NA	servicios_gubernamentales	fuera_sinaloa	93
