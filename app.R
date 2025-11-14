@@ -10,6 +10,8 @@ DATE <- Sys.Date() # later make it reactive upon everything
 TEMPLATE$date <- DATE
 SECTORS <- unique(TEMPLATE$sector)
 
+MODE_ORIDEST <- "mode_oridest"
+
 # UI helpers ----
 
 select_mode <- radioButtons("template_mode",
@@ -18,7 +20,7 @@ select_mode <- radioButtons("template_mode",
     "A partir de las matrices de Origen y Destino.",
     "A partir de ingresar manualmente los choques en la demanda final."
   ),
-  choiceValues = c("mode_oridest", "mode_shocks")
+  choiceValues = c(MODE_ORIDEST, "mode_shocks")
 )
 
 
@@ -39,7 +41,7 @@ mode_params <- tabsetPanel(
 
 ui <- fluidPage(
   select_mode,
-  textInput("experimento", "Nombre del Experimento"),
+  textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", MXN_USD, min = 0),
   mode_params,
   dataTableOutput("template_tab")
@@ -51,9 +53,24 @@ server <- function(input, output) {
   observeEvent(input$template_mode, {
     updateTabsetPanel(inputId = "mode_params", selected = input$template_mode)
   })
- 
-  output$template_tab <- renderDataTable(TEMPLATE)
-  
+
+  template <- reactive({
+    TEMPLATE |>
+      mutate(experiment_name = input$experiment_name)
+  })
+
+  # use_origin_destino <- reactive(input$template_mode == MODE_ORIDEST)
+  #
+  # template <- reactive({
+  #   template()$use_origen_destino <- use_origin_destino()
+  #   template
+  # })
+
+  # template <- reactive(template()$origen_destino_sector <- input$oridest_sector)
+  # template <- reactive(template()$investment_usd <- input$oridest_invest)
+  # template <- reactive(template()$exrate <- input$tipo_cambio)
+
+  output$template_tab <- renderDataTable(template())
 }
 
 shinyApp(ui = ui, server = server)
