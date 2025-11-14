@@ -7,7 +7,6 @@ TEMPLATE <- read_tsv("data/input_base.tsv")
 
 MXN_USD <- 18.5
 DATE <- Sys.Date() # later make it reactive upon everything
-TEMPLATE$date <- DATE
 SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
@@ -56,19 +55,16 @@ server <- function(input, output) {
 
   template <- reactive({
     TEMPLATE |>
-      mutate(experiment_name = input$experiment_name)
+      mutate(
+        experiment_name = input$experiment_name,
+        date = Sys.time(),
+        use_origen_destino = input$template_mode == MODE_ORIDEST,
+        origen_destino_sector = input$oridest_sector,
+        investment_usd = input$oridest_invest,
+        exrate = input$tipo_cambio
+      )
   })
 
-  # use_origin_destino <- reactive(input$template_mode == MODE_ORIDEST)
-  #
-  # template <- reactive({
-  #   template()$use_origen_destino <- use_origin_destino()
-  #   template
-  # })
-
-  # template <- reactive(template()$origen_destino_sector <- input$oridest_sector)
-  # template <- reactive(template()$investment_usd <- input$oridest_invest)
-  # template <- reactive(template()$exrate <- input$tipo_cambio)
 
   output$template_tab <- renderDataTable(template())
 }
