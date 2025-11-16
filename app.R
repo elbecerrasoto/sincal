@@ -1,5 +1,6 @@
 library(shiny)
 library(tidyverse)
+library(glue)
 
 # globals ----
 
@@ -56,7 +57,7 @@ mode_params <- tabsetPanel(
   tabPanel(
     "mode_oridest",
     selectInput("oridest_sector", "Selecciona el sector:", choices = SECTORS),
-    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", value = 0, min = 0)
+    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", value = 0, min = 0),
   ),
   tabPanel(
     "mode_shocks"
@@ -70,7 +71,7 @@ ui <- fluidPage(
   textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
-  verbatimTextOutput("non_zero"),
+  uiOutput("splits"),
   dataTableOutput("template_tab")
 )
 
@@ -82,6 +83,7 @@ server <- function(input, output) {
   })
 
   template <- reactive({
+    req(input$experiment_name != "")
     if (input$template_mode == MODE_ORIDEST) {
       out <- TEMPLATE |>
         mutate(
@@ -108,12 +110,18 @@ server <- function(input, output) {
     out
   })
 
-  non_zero_sectors <- reactive({
-    bmask <- !near(SECTORS_STRUCTURE[, input$oridest_sector], 0.0)
-    SECTORS[bmask]
-  })
+  # selected_structure <- reactive({
+  #   bmask <- !near(SECTORS_STRUCTURE[, input$oridest_sector], 0.0)
+  #   SECTORS[bmask]
+  # })
+  #
+  # output$splits <- (
+  #   {
+  #     map(non_zero_sectors(), \(sector)
+  #         sliderInput(sector, glue("Porcentaje de {sector} que se queda"), value = 0.5, min = 0, max = 1))
+  #   }
+  # )
 
-  output$non_zero <- renderText(non_zero_sectors())
   output$template_tab <- renderDataTable(template())
 }
 
