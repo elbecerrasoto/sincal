@@ -6,7 +6,6 @@ library(tidyverse)
 TEMPLATE <- read_tsv("data/input_base.tsv")
 
 MXN_USD <- 18.5
-DATE <- Sys.Date() # later make it reactive upon everything
 SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
@@ -39,8 +38,6 @@ stopifnot(
     all(near(cs, 1) | near(cs, 0))
 )
 
-
-
 # UI helpers ----
 
 select_mode <- radioButtons("template_mode",
@@ -58,8 +55,8 @@ mode_params <- tabsetPanel(
   type = "hidden",
   tabPanel(
     "mode_oridest",
-    selectInput("oridest_sector", "Selecciona el sector:", SECTORS),
-    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", 0, min = 0)
+    selectInput("oridest_sector", "Selecciona el sector:", choices = SECTORS),
+    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", value = 0, min = 0)
   ),
   tabPanel(
     "mode_shocks"
@@ -71,7 +68,7 @@ mode_params <- tabsetPanel(
 ui <- fluidPage(
   select_mode,
   textInput("experiment_name", "Nombre del Experimento"),
-  numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", MXN_USD, min = 0),
+  numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   verbatimTextOutput("non_zero"),
   dataTableOutput("template_tab")
