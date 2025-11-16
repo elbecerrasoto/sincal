@@ -62,7 +62,6 @@ select_input <- radioButtons("numericORslider",
 )
 
 
-
 mode_params <- tabsetPanel(
   id = "mode_params",
   type = "hidden",
@@ -131,7 +130,7 @@ server <- function(input, output) {
 
 
   output$splits <- renderUI({
-    # req(input$oridest_invest > 0 && input$experiment_name != "")
+    req(input$oridest_invest > 0 && input$experiment_name != "" && input$template_mode == MODE_ORIDEST)
 
     slider_text <- "El sector: <i>{input$oridest_sector}</i> demanda
                            {round(input$oridest_invest * sector_struct,ROUND)} USD
@@ -147,15 +146,16 @@ server <- function(input, output) {
     if (input$numericORslider == MODE_SLIDER) {
       out <- non_zero_sorted |>
         imap(\(sector_struct, sector)
-        sliderInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+        sliderInput(glue("split_{sector}"), HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
     } else {
       out <- non_zero_sorted |>
         imap(\(sector_struct, sector)
-        numericInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+        numericInput(glue("split_{sector}"), HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
     }
     out
   })
 
+  # captured_splits <- reactive()
 
   # output$debug <- renderText(selected_structure())
   output$template_tab <- renderDataTable(template())
