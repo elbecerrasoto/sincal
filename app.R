@@ -72,7 +72,8 @@ ui <- fluidPage(
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   uiOutput("splits"),
-  dataTableOutput("template_tab")
+  dataTableOutput("template_tab"),
+  verbatimTextOutput("debug")
 )
 
 # server ----
@@ -110,11 +111,13 @@ server <- function(input, output) {
     out
   })
 
-  # selected_structure <- reactive({
-  #   bmask <- !near(SECTORS_STRUCTURE[, input$oridest_sector], 0.0)
-  #   SECTORS[bmask]
-  # })
-  #
+  selected_structure <- reactive({
+    SECTORS_STRUCTURE[, input$oridest_sector, drop = TRUE] |>
+      set_names(SECTORS)
+  })
+
+  output$debug <- renderText(selected_structure())
+  
   # output$splits <- (
   #   {
   #     map(non_zero_sectors(), \(sector)
