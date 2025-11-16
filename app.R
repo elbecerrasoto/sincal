@@ -7,6 +7,7 @@ library(glue)
 TEMPLATE <- read_tsv("data/input_base.tsv")
 
 MXN_USD <- 18.5
+ROUND <- 2
 SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
@@ -116,15 +117,25 @@ server <- function(input, output) {
       set_names(SECTORS)
   })
 
-  output$debug <- renderText(selected_structure())
-  
-  # output$splits <- (
-  #   {
-  #     map(non_zero_sectors(), \(sector)
-  #         sliderInput(sector, glue("Porcentaje de {sector} que se queda"), value = 0.5, min = 0, max = 1))
-  #   }
-  # )
 
+  output$splits <- renderUI({
+    # req(input$oridest_invest > 0 && input$experiment_name != "")
+
+    slider_text <- "El sector: <i>{input$oridest_sector}</i> demanda
+                           {round(input$oridest_invest * sector_struct,ROUND)} USD
+                            ({round(sector_struct*100,ROUND)}% de la inversión)
+                           del sector <i>{sector}</i>.
+                           ¿Qué porcentaje de esta inversión debería quedarse en Sinaloa?
+                           (el resto se iría a otros estados de la República)."
+    selected_structure() |>
+      discard(~ near(.x, 0)) |>
+      sort(, decreasing = TRUE) |>
+      imap(\(sector_struct, sector)
+      sliderInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+  })
+
+
+  # output$debug <- renderText(selected_structure())
   output$template_tab <- renderDataTable(template())
 }
 
