@@ -11,6 +11,7 @@ ROUND <- 2
 SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
+MODE_SLIDER <- "slider"
 
 ORI_DEST <- "data/origen_destino.rds"
 
@@ -51,6 +52,16 @@ select_mode <- radioButtons("template_mode",
   choiceValues = c(MODE_ORIDEST, "mode_shocks")
 )
 
+select_input <- radioButtons("numericORslider",
+  "¿Cómo deseas ingresear los valores?",
+  choiceNames = c(
+    "A través de una barra deslizante\n(primera vez, fácil de usar, prototipado).",
+    "A través de teclear los valores\n(exactitud, corrida final)."
+  ),
+  choiceValues = c(MODE_SLIDER, "numeric")
+)
+
+
 
 mode_params <- tabsetPanel(
   id = "mode_params",
@@ -69,6 +80,7 @@ mode_params <- tabsetPanel(
 
 ui <- fluidPage(
   select_mode,
+  select_input,
   textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
@@ -127,11 +139,21 @@ server <- function(input, output) {
                            del sector <i>{sector}</i>.
                            ¿Qué porcentaje de esta inversión debería quedarse en Sinaloa?
                            (el resto se iría a otros estados de la República)."
-    selected_structure() |>
+
+    non_zero_sorted <- selected_structure() |>
       discard(~ near(.x, 0)) |>
-      sort(, decreasing = TRUE) |>
-      imap(\(sector_struct, sector)
-      sliderInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+      sort(, decreasing = TRUE)
+
+    if (input$numericORslider == MODE_SLIDER) {
+      out <- non_zero_sorted |>
+        imap(\(sector_struct, sector)
+        sliderInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+    } else {
+      out <- non_zero_sorted |>
+        imap(\(sector_struct, sector)
+        numericInput(sector, HTML(glue(slider_text)), value = 0.5, min = 0, max = 1))
+    }
+    out
   })
 
 
