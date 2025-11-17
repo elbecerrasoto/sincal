@@ -97,21 +97,17 @@ server <- function(input, output) {
 
   template <- reactive({
     if (input$template_mode == MODE_ORIDEST) {
-      # infinite loop, debug this ...
-      # Vorigen_destino_structure = selected_structure()
-      # Vsplit = captured_splits()
       out <- TEMPLATE |>
         mutate(
           experiment_name = input$experiment_name,
           date = Sys.time(),
           use_origen_destino = input$template_mode == MODE_ORIDEST,
           origen_destino_sector = input$oridest_sector,
-          origen_destino_structure = 0.5,
+          origen_destino_structure = rep(selected_structure(), 2),
           split = 0.5,
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio
         )
-      out$origen_destino_structure <- rep(SECTORS_STRUCTURE[, input$oridest_sector], 2)
     } else {
       out <- TEMPLATE |>
         mutate(
@@ -158,22 +154,22 @@ server <- function(input, output) {
   })
 
 
-  captured_splits <- reactive({
-    splits_sin <- rep(0, length(SECTORS))
-    splits_sin <- set_names(splits_sin, SECTORS)
-
-    for (iname in names(input)) {
-      if (is.numeric(input[[iname]]) && any(SECTORS %in% iname)) {
-        splits_sin[SECTORS %in% iname] <- input[[iname]]
-      }
-    }
-
-    splits_nat <- 1 - splits_sin
-
-    c(splits_sin, splits_nat)
-  })
-
-  # output$debug <- renderText(captured_splits())
+  # captured_splits <- reactive({
+  #   splits_sin <- rep(0, length(SECTORS))
+  #   splits_sin <- set_names(splits_sin, SECTORS)
+  #
+  #   for (iname in names(input)) {
+  #     if (is.numeric(input[[iname]]) && any(SECTORS %in% iname)) {
+  #       splits_sin[SECTORS %in% iname] <- input[[iname]]
+  #     }
+  #   }
+  #
+  #   splits_nat <- 1 - splits_sin
+  #
+  #   c(splits_sin, splits_nat)
+  # })
+  #
+  output$debug <- renderText(selected_structure())
   output$template_tab <- renderDataTable(template())
 }
 
