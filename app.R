@@ -106,7 +106,8 @@ server <- function(input, output) {
           origen_destino_structure = rep(selected_structure(), 2),
           split = 0.5,
           investment_usd = input$oridest_invest,
-          exrate = input$tipo_cambio
+          exrate = input$tipo_cambio,
+          shocks_millones_mxn = NA
         )
     } else {
       out <- TEMPLATE |>
@@ -115,8 +116,11 @@ server <- function(input, output) {
           date = Sys.time(),
           use_origen_destino = input$template_mode == MODE_ORIDEST,
           origen_destino_sector = NA,
+          origen_destino_structure = NA,
+          split = NA,
           investment_usd = NA,
-          exrate = input$tipo_cambio
+          exrate = input$tipo_cambio,
+          shocks_millones_mxn = NA
         )
     }
 
