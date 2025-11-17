@@ -134,6 +134,7 @@ server <- function(input, output) {
 
 
   output$splits <- renderUI({
+    req(input$template_mode == MODE_ORIDEST)
     slider_text <- "El sector: <i>{input$oridest_sector}</i> demanda
                            {round(input$oridest_invest * sector_struct,ROUND)} USD
                             ({round(sector_struct*100,ROUND)}% de la inversión)
@@ -158,23 +159,24 @@ server <- function(input, output) {
   })
 
 
-  # captured_splits <- reactive({
-  #   splits_sin <- rep(0, length(SECTORS))
-  #   splits_sin <- set_names(splits_sin, SECTORS)
-  #
-  #   for (iname in names(input)) {
-  #     if (is.numeric(input[[iname]]) && any(SECTORS %in% iname)) {
-  #       splits_sin[SECTORS %in% iname] <- input[[iname]]
-  #     }
-  #   }
-  #
-  #   splits_nat <- 1 - splits_sin
-  #
-  #   c(splits_sin, splits_nat)
-  # })
-  #
-  output$debug <- renderText(selected_structure())
-  output$template_tab <- renderDataTable(template())
+  captured_splits <- reactive({
+    req(input$template_mode == MODE_ORIDEST)
+    
+    splits_sin <- rep(0, length(SECTORS)) |> set_names(SECTORS)
+
+    for (iname in names(input)) {
+      if (is.numeric(input[[iname]]) && (iname %in% SECTORS)) {
+        splits_sin[SECTORS %in% iname] <- input[[iname]]
+      }
+    }
+
+    splits_nat <- 1 - splits_sin
+
+    c(splits_sin, splits_nat)
+  })
+
+  output$debug <- renderText(captured_splits())
+  output$template_tab <- renderDataTable(template()) # Filter NA's and metadata
 }
 
 shinyApp(ui = ui, server = server)
