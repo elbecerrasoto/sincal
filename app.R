@@ -2,8 +2,45 @@ library(shiny)
 library(tidyverse)
 library(glue)
 library(DT)
+source("helper.R")
 
 # globals ----
+
+MIP_PATH <- "data/mip_sinaloa.tsv"
+EMPLOYMENT_PATH <- "data/empleos_impuestos.tsv"
+
+EMPLOYMENT <- read_tsv(EMPLOYMENT_PATH) |>
+  filter(!is.na(sector))
+
+get_employment_matrices <- function(employment, sinaloa) {
+  etype <- names(employment)[4:length(employment)]
+  employment[etype] |>
+    map(get_T, L = sinaloa$L, x = sinaloa$x) |>
+    set_names(etype)
+}
+
+SINALOA <- read_tsv(MIP_PATH) |>
+  get_ZAB_LG_fx_Madds()
+
+TSIN_ALL <- EMPLOYMENT |>
+  get_employment_matrices(SINALOA)
+
+
+BIREGIONAL_MULTIPLIERS <- tibble(
+  directos = rep(1, N_SECTORS),
+  indirectos = colSums(SINALOA$M1a),
+  desbordamiento = colSums(SINALOA$M2a),
+  retroalimentacion = colSums(SINALOA$M3a)
+)
+
+row_totals <- rowSums(BIREGIONAL)
+
+BIREGIONAL_PERCENTS <- BIREGIONAL |>
+  mutate(across(
+    everything(),
+    \(x) x / row_totals
+  ))
+
 
 TEMPLATE <- read_tsv("data/input_base.tsv")
 
@@ -219,6 +256,12 @@ server <- function(input, output) {
     out
   })
 
+
+  # Main Calculation
+  # pib <- sinaloa$L %*% shocks |> as.double()
+  # empleos <- map(Tsin_all, \(M) M %*% shocks |> as.double()) |>
+  #   as_tibble()
+  #
 
   # output$template <- renderDataTable(
   #   template()
