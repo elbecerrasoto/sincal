@@ -45,11 +45,13 @@ stopifnot(
 
 # UI helpers ----
 
+
+
 select_mode <- radioButtons("template_mode",
-  "Seleciona la plantilla de entrada a generar:",
+  "Seleciona el modo a utilizar:",
   choiceNames = c(
-    "A partir de las matrices de Origen y Destino.",
-    "A partir de ingresar manualmente los choques en la demanda final."
+    "Modo 1: Generar inversiones a partir de las matrices de Origen y Destino.",
+    "Modo 2: Generar inversiones a partir de ingresar manualmente los choques en la demanda final."
   ),
   choiceValues = c(MODE_ORIDEST, "mode_shocks")
 )
