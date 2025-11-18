@@ -1,6 +1,7 @@
 library(shiny)
 library(tidyverse)
 library(glue)
+library(DT)
 
 # globals ----
 
@@ -8,6 +9,7 @@ TEMPLATE <- read_tsv("data/input_base.tsv")
 
 MXN_USD <- 18.5
 ROUND <- 2
+MIP_SCALE <- 1e6 # MXN
 SECTORS <- unique(TEMPLATE$sector)
 
 MODE_ORIDEST <- "mode_oridest"
@@ -110,7 +112,8 @@ ui <- fluidPage(
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   uiOutput("splits"),
-  uiOutput("raw_shocks"),
+  dataTableOutput("template"),
+  verbatimTextOutput("debug")
 )
 
 # server ----
@@ -171,11 +174,19 @@ server <- function(input, output) {
   })
 
   shocks_millones_mxn <- reactive({
-    req(input$template_mode == MODE_ORIDEST)
-    captured_splits() * selected_structure() * input$tipo_cambio * input$oridest_invest
+    if (input$template_mode == MODE_ORIDEST) {
+      out <- captured_splits() * selected_structure() * input$tipo_cambio * input$oridest_invest / MIP_SCALE
+    } else {
+      sectors70 <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+      out <- map_dbl(sectors70, ~ input[[.x]])
+    }
+    out
   })
 
+
   template <- reactive({
+    Vshocks_millones_mxn <- shocks_millones_mxn()
+
     if (input$template_mode == MODE_ORIDEST) {
       out <- TEMPLATE |>
         mutate(
@@ -187,7 +198,7 @@ server <- function(input, output) {
           split = captured_splits(),
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio,
-          shocks_millones_mxn = shocks_millones_mxn()
+          shocks_millones_mxn = Vshocks_millones_mxn
         )
     } else {
       out <- TEMPLATE |>
@@ -198,14 +209,25 @@ server <- function(input, output) {
           origen_destino_sector = NA,
           origen_destino_structure = NA,
           split = NA,
-          investment_usd = NA,
+          investment_usd = sum(Vshocks_millones_mxn) * MIP_SCALE / input$tipo_cambio,
           exrate = input$tipo_cambio,
-          shocks_millones_mxn = NA
+          shocks_millones_mxn = Vshocks_millones_mxn
         )
     }
-
     out
   })
+
+
+  output$template <- renderDataTable(
+    template()
+  )
+
+  # output$debug <- renderText({
+  #     sectors70 <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+  #     out <- rep(0, length = (length(SECTORS) * 2)) |>
+  #       set_names(sectors70)
+  #     input[sectors70]
+  # })
 }
 
 shinyApp(ui = ui, server = server)
