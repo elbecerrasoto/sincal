@@ -114,8 +114,8 @@ ui <- fluidPage(
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   uiOutput("splits"),
-  dataTableOutput("template"),
-  verbatimTextOutput("debug")
+  # dataTableOutput("template"),
+  # verbatimTextOutput("debug")
 )
 
 # server ----
@@ -220,16 +220,11 @@ server <- function(input, output) {
   })
 
 
-  output$template <- renderDataTable(
-    template()
-  )
+  # output$template <- renderDataTable(
+  #   template()
+  # )
 
-  # output$debug <- renderText({
-  #     sectors70 <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-  #     out <- rep(0, length = (length(SECTORS) * 2)) |>
-  #       set_names(sectors70)
-  #     input[sectors70]
-  # })
+  # output$debug <- renderText({})
 }
 
 shinyApp(ui = ui, server = server)
