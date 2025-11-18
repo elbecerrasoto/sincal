@@ -104,7 +104,7 @@ server <- function(input, output) {
           use_origen_destino = input$template_mode == MODE_ORIDEST,
           origen_destino_sector = input$oridest_sector,
           origen_destino_structure = rep(selected_structure(), 2),
-          split = 0.5,
+          split = captured_splits(),
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio,
           shocks_millones_mxn = NA
@@ -132,9 +132,9 @@ server <- function(input, output) {
       set_names(SECTORS)
   })
 
-
   output$splits <- renderUI({
     req(input$template_mode == MODE_ORIDEST)
+
     slider_text <- "El sector: <i>{input$oridest_sector}</i> demanda
                            {round(input$oridest_invest * sector_struct,ROUND)} USD
                             ({round(sector_struct*100,ROUND)}% de la inversión)
@@ -161,12 +161,12 @@ server <- function(input, output) {
 
   captured_splits <- reactive({
     req(input$template_mode == MODE_ORIDEST)
-    
+
     splits_sin <- rep(0, length(SECTORS)) |> set_names(SECTORS)
 
-    for (iname in names(input)) {
-      if (is.numeric(input[[iname]]) && (iname %in% SECTORS)) {
-        splits_sin[SECTORS %in% iname] <- input[[iname]]
+    for (sector in SECTORS) {
+      if (!is.null(input[[sector]])) {
+        splits_sin[SECTORS %in% sector] <- input[[sector]]
       }
     }
 
