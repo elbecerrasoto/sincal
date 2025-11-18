@@ -52,7 +52,7 @@ select_mode <- radioButtons("template_mode",
   choiceValues = c(MODE_ORIDEST, "mode_shocks")
 )
 
-select_input <- radioButtons("numericORslider",
+numeric_or_slider <- radioButtons("numericORslider",
   "¿Cómo deseas ingresear los valores?",
   choiceNames = c(
     "A través de una barra deslizante\n(primera vez, fácil de usar, prototipado).",
@@ -61,17 +61,44 @@ select_input <- radioButtons("numericORslider",
   choiceValues = c(MODE_SLIDER, "numeric")
 )
 
+input_sectors_sinaloa <- SECTORS |>
+  map(\(sector)
+  numericInput(glue("{sector}_sinaloa"),
+    glue(
+      "SINALOA: {str_to_upper(sector)}
+                     Cantidad demandada dentro de Sinaloa en millones de pesos
+                     del sector {sector}"
+    ),
+    value = 0, min = 0
+  ))
+
+
+input_sectors_mexico <- SECTORS |>
+  map(\(sector)
+  numericInput(glue("{sector}_mexico"),
+    glue(
+      "MEXICO: {str_to_upper(sector)}
+                     Cantidad demandada fuera de Sinaloa en millones de pesos
+                     del sector {sector}"
+    ),
+    value = 0, min = 0
+  ))
 
 mode_params <- tabsetPanel(
   id = "mode_params",
   type = "hidden",
   tabPanel(
     "mode_oridest",
+    numeric_or_slider,
     selectInput("oridest_sector", "Selecciona el sector:", choices = SECTORS),
     numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", value = 0, min = 0),
   ),
   tabPanel(
-    "mode_shocks"
+    "mode_shocks",
+    fluidRow(
+      column(6, input_sectors_sinaloa),
+      column(6, input_sectors_mexico)
+    )
   ),
 )
 
@@ -79,13 +106,11 @@ mode_params <- tabsetPanel(
 
 ui <- fluidPage(
   select_mode,
-  select_input,
   textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   uiOutput("splits"),
-  dataTableOutput("template_tab"),
-  verbatimTextOutput("debug")
+  uiOutput("raw_shocks"),
 )
 
 # server ----
@@ -104,7 +129,8 @@ server <- function(input, output) {
   output$splits <- renderUI({
     req(input$template_mode == MODE_ORIDEST)
 
-    slider_text <- "El sector: <i>{input$oridest_sector}</i> demanda
+    slider_text <- "{str_to_upper(input$oridest_sector)}: {str_to_upper(sector)}
+                           El sector: <i>{input$oridest_sector}</i> demanda
                            {round(input$oridest_invest * sector_struct,ROUND)} USD
                             ({round(sector_struct*100,ROUND)}% de la inversión)
                            del sector <i>{sector}</i>.
@@ -180,10 +206,6 @@ server <- function(input, output) {
 
     out
   })
-
-
-  # output$debug <- renderText(captured_splits())
-  output$template_tab <- renderDataTable(template()) # Filter NA's and metadata
 }
 
 shinyApp(ui = ui, server = server)
