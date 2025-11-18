@@ -95,42 +95,11 @@ server <- function(input, output) {
     updateTabsetPanel(inputId = "mode_params", selected = input$template_mode)
   })
 
-  template <- reactive({
-    if (input$template_mode == MODE_ORIDEST) {
-      out <- TEMPLATE |>
-        mutate(
-          experiment_name = input$experiment_name,
-          date = Sys.time(),
-          use_origen_destino = input$template_mode == MODE_ORIDEST,
-          origen_destino_sector = input$oridest_sector,
-          origen_destino_structure = rep(selected_structure(), 2),
-          split = captured_splits(),
-          investment_usd = input$oridest_invest,
-          exrate = input$tipo_cambio,
-          shocks_millones_mxn = NA
-        )
-    } else {
-      out <- TEMPLATE |>
-        mutate(
-          experiment_name = input$experiment_name,
-          date = Sys.time(),
-          use_origen_destino = input$template_mode == MODE_ORIDEST,
-          origen_destino_sector = NA,
-          origen_destino_structure = NA,
-          split = NA,
-          investment_usd = NA,
-          exrate = input$tipo_cambio,
-          shocks_millones_mxn = NA
-        )
-    }
-
-    out
-  })
-
   selected_structure <- reactive({
     SECTORS_STRUCTURE[, input$oridest_sector, drop = TRUE] |>
       set_names(SECTORS)
   })
+
 
   output$splits <- renderUI({
     req(input$template_mode == MODE_ORIDEST)
@@ -175,7 +144,45 @@ server <- function(input, output) {
     c(splits_sin, splits_nat)
   })
 
-  output$debug <- renderText(captured_splits())
+  shocks_millones_mxn <- reactive({
+    req(input$template_mode == MODE_ORIDEST)
+    captured_splits() * selected_structure() * input$tipo_cambio * input$oridest_invest
+  })
+
+  template <- reactive({
+    if (input$template_mode == MODE_ORIDEST) {
+      out <- TEMPLATE |>
+        mutate(
+          experiment_name = input$experiment_name,
+          date = Sys.time(),
+          use_origen_destino = input$template_mode == MODE_ORIDEST,
+          origen_destino_sector = input$oridest_sector,
+          origen_destino_structure = rep(selected_structure(), 2),
+          split = captured_splits(),
+          investment_usd = input$oridest_invest,
+          exrate = input$tipo_cambio,
+          shocks_millones_mxn = shocks_millones_mxn()
+        )
+    } else {
+      out <- TEMPLATE |>
+        mutate(
+          experiment_name = input$experiment_name,
+          date = Sys.time(),
+          use_origen_destino = input$template_mode == MODE_ORIDEST,
+          origen_destino_sector = NA,
+          origen_destino_structure = NA,
+          split = NA,
+          investment_usd = NA,
+          exrate = input$tipo_cambio,
+          shocks_millones_mxn = NA
+        )
+    }
+
+    out
+  })
+
+
+  # output$debug <- renderText(captured_splits())
   output$template_tab <- renderDataTable(template()) # Filter NA's and metadata
 }
 
