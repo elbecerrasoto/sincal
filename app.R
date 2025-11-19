@@ -141,7 +141,7 @@ ui <- fluidPage(
       textInput("experiment_name", "Nombre del Experimento"),
       numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0)
     ),
-    mainPanel(uiOutput("totals")),
+    mainPanel(uiOutput("totals"), downloadButton("download", "Descargar Resultados")),
   ),
   mode_params,
   uiOutput("splits"),
@@ -301,6 +301,13 @@ server <- function(input, output) {
     )
   })
 
+
+  output$download <- downloadHandler(
+    filename = function() {
+      glue("{input$experiment_name}_{Sys.Date()}.tsv")
+    },
+    content = function(file) write_tsv(results(), file)
+  )
 
   output$output_tab <- DT::renderDataTable({
     results()
