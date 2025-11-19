@@ -1,3 +1,4 @@
+library(glue)
 source("helper.R")
 
 get_employment_matrices <- function(employment, sinaloa) {
@@ -9,24 +10,24 @@ get_employment_matrices <- function(employment, sinaloa) {
 
 
 get_biregional <- function(sinaloa) {
-
   biregional_multipliers <- tibble(
     directos = rep(1, N_SECTORS),
     indirectos = colSums(SINALOA$M1a),
     desbordamiento = colSums(SINALOA$M2a),
     retroalimentacion = colSums(SINALOA$M3a)
   )
-  
+
   row_totals <- rowSums(biregional_multipliers)
-  
+
   biregional_percents <- biregional_multipliers |>
     mutate(across(
       everything(),
       \(x) x / row_totals
     ))
-  
+
+  biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_percent"))
+
   biregional_percents
-  
 }
 
 get_sector_structure <- function(origen_destino_all) {

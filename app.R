@@ -117,7 +117,8 @@ ui <- fluidPage(
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
   mode_params,
   uiOutput("splits"),
-  # dataTableOutput("template"),
+  dataTableOutput("input_tab"),
+  dataTableOutput("output_tab"),
   # verbatimTextOutput("debug")
 )
 
@@ -222,18 +223,37 @@ server <- function(input, output) {
     out
   })
 
+  main_shocks <- reactive({
+    template()$shocks_millones_mxn
+  })
 
   # Main Calculation
-  # pib <- sinaloa$L %*% shocks |> as.double()
-  # empleos <- map(Tsin_all, \(M) M %*% shocks |> as.double()) |>
-  #   as_tibble()
-  #
+  pib <- reactive({
+    SINALOA$L %*% main_shocks() |> as.double()
+  })
 
-  # output$template <- renderDataTable(
-  #   template()
-  # )
+  # Main Calculation
+  empleos <- reactive({
+    map(TSIN_ALL, \(M) M %*% main_shocks() |> as.double()) |>
+      as_tibble()
+  })
 
-  # output$debug <- renderText({})
+  results <- reactive(
+    empleos() |>
+      mutate(pib = pib()) |>
+      relocate(pib) |>
+      bind_cols(BIREGIONAL)
+  )
+
+  output$input_tab <- renderDataTable(
+    template()
+  )
+
+  output$output_tab <- renderDataTable(
+    results()
+  )
+
+  # output$debug <- renderText(empleos())
 }
 
 shinyApp(ui = ui, server = server)
