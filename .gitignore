@@ -6,4 +6,6 @@
 *.Rproj
 results
 
+ignore
+scripts/tabulados_TODFBCF
 

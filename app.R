@@ -2,75 +2,43 @@ library(shiny)
 library(tidyverse)
 library(glue)
 library(DT)
-source("helper.R")
+source("app_helper.R")
 
 # globals ----
 
 MIP_PATH <- "data/mip_sinaloa.tsv"
 EMPLOYMENT_PATH <- "data/empleos_impuestos.tsv"
+TEMPLATE_PATH <- "data/input_base.tsv"
+ORI_DEST_PATH <- "data/origen_destino.rds"
+
+MXN_USD <- 18.5 # Exchange rate MXN to USD
+ROUND <- 2 # Rounding of numbers for printing
+MIP_SCALE <- 1e6 # The scale input of the MIP, in this case millions of MXN
+
+# Leontieff Stuff
+SINALOA <- read_tsv(MIP_PATH) |>
+  get_ZAB_LG_fx_Madds()
 
 EMPLOYMENT <- read_tsv(EMPLOYMENT_PATH) |>
   filter(!is.na(sector))
 
-get_employment_matrices <- function(employment, sinaloa) {
-  etype <- names(employment)[4:length(employment)]
-  employment[etype] |>
-    map(get_T, L = sinaloa$L, x = sinaloa$x) |>
-    set_names(etype)
-}
-
-SINALOA <- read_tsv(MIP_PATH) |>
-  get_ZAB_LG_fx_Madds()
-
+# Vectors that depend of Final Demand like number of employees.
 TSIN_ALL <- EMPLOYMENT |>
   get_employment_matrices(SINALOA)
 
+# Input template
+TEMPLATE <- read_tsv(TEMPLATE_PATH)
 
-BIREGIONAL_MULTIPLIERS <- tibble(
-  directos = rep(1, N_SECTORS),
-  indirectos = colSums(SINALOA$M1a),
-  desbordamiento = colSums(SINALOA$M2a),
-  retroalimentacion = colSums(SINALOA$M3a)
-)
+BIREGIONAL <- get_biregional(SINALOA)
 
-row_totals <- rowSums(BIREGIONAL)
-
-BIREGIONAL_PERCENTS <- BIREGIONAL |>
-  mutate(across(
-    everything(),
-    \(x) x / row_totals
-  ))
-
-
-TEMPLATE <- read_tsv("data/input_base.tsv")
-
-MXN_USD <- 18.5
-ROUND <- 2
-MIP_SCALE <- 1e6 # MXN
+# The 35 sectors
 SECTORS <- unique(TEMPLATE$sector)
 
-MODE_ORIDEST <- "mode_oridest"
-MODE_SLIDER <- "slider"
+# Shiny Flags
+MODE_ORIDEST <- "mode_oridest" # Flag for Origen y Destino Mode
+MODE_SLIDER <- "slider" # Flag for Slider Activation
 
-ORI_DEST <- "data/origen_destino.rds"
-
-get_sector_structure <- function(origen_destino_all) {
-  origen_destino <- reduce(origen_destino_all, `+`)
-  origen_destino[origen_destino < 0] <- 0
-
-  relative_buys <- function(col) {
-    total <- sum(col)
-    if (total > 0) {
-      col / total
-    } else {
-      return(rep(0, length(col)))
-    }
-  }
-
-  apply(origen_destino, 2, relative_buys)
-}
-
-SECTORS_STRUCTURE <- read_rds(ORI_DEST) |>
+SECTORS_STRUCTURE <- read_rds(ORI_DEST_PATH) |>
   get_sector_structure() |>
   `colnames<-`(SECTORS)
 
@@ -81,8 +49,6 @@ stopifnot(
 )
 
 # UI helpers ----
-
-
 
 select_mode <- radioButtons("template_mode",
   "Seleciona el modo a utilizar:",
