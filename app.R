@@ -134,9 +134,14 @@ ui <- fluidPage(
     El segundo modo da total control al permitir desglozar la inversión de cualquier manera.
     IMPORTANTE: en este modo las cantidades a ingresar están en millones de pesos.
     "),
-  select_mode,
-  textInput("experiment_name", "Nombre del Experimento"),
-  numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
+  sidebarLayout(
+    sidebarPanel(
+      select_mode,
+      textInput("experiment_name", "Nombre del Experimento"),
+      numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0)
+    ),
+    mainPanel(),
+  ),
   mode_params,
   uiOutput("splits"),
   dataTableOutput("input_tab"),
@@ -283,9 +288,9 @@ server <- function(input, output) {
   #   template()
   # )
 
-  output$output_tab <- renderDataTable(
-    results()
-  )
+  # output$output_tab <- renderDataTable(
+  #   results()
+  # )
 
   # output$debug <- renderText(empleos())
 }
