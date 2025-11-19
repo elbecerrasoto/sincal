@@ -25,10 +25,13 @@ get_biregional <- function(sinaloa) {
       \(x) x / row_totals
     ))
 
-  biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_porcentaje"))
+  # biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_porcentaje"))
 
   biregional_percents
 }
+
+
+
 
 get_sector_structure <- function(origen_destino_all) {
   origen_destino <- reduce(origen_destino_all, `+`)

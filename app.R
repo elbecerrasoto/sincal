@@ -37,6 +37,7 @@ SECTORS <- unique(TEMPLATE$sector)
 # Shiny Flags
 MODE_ORIDEST <- "mode_oridest" # Flag for Origen y Destino Mode
 MODE_SLIDER <- "slider" # Flag for Slider Activation
+MODE_EFFECTS <- "mode_effects" # Flag for adding the effects to the result table
 
 SECTORS_STRUCTURE <- read_rds(ORI_DEST_PATH) |>
   get_sector_structure() |>
@@ -48,7 +49,6 @@ stopifnot(
     all(near(cs, 1) | near(cs, 0))
 )
 
-MODE_EFFECTS <- "mode_effects"
 
 # UI helpers ----
 
@@ -251,19 +251,38 @@ server <- function(input, output) {
       as_tibble()
   })
 
-  results <- reactive(
-    empleos() |>
+  # Present the results
+  raw_results <- reactive({
+    results_intermediate <- empleos() |>
       mutate(pib = pib()) |>
-      relocate(pib) |>
-      bind_cols(BIREGIONAL)
-  )
+      relocate(pib)
 
-  output$input_tab <- renderDataTable(
-    template()
-  )
+    if (input$effect_breakdown == MODE_EFFECTS) {
+      breffects <- imap(
+        BIREGIONAL,
+        function(brcol, brcol_name) {
+          results_intermediate |>
+            mutate(across(
+              everything(),
+              ~ .x * brcol
+            )) |>
+            rename_with(~ paste0(brcol_name, "_", .x))
+        }
+      )
+
+      out <- bind_cols(results_intermediate, BIREGIONAL, breffects)
+    } else {
+      out <- bind_cols(results_intermediate, BIREGIONAL)
+    }
+    out
+  })
+
+  # output$input_tab <- renderDataTable(
+  #   template()
+  # )
 
   output$output_tab <- renderDataTable(
-    results()
+    raw_results()
   )
 
   # output$debug <- renderText(empleos())
