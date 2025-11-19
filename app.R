@@ -111,7 +111,7 @@ mode_params <- tabsetPanel(
     "mode_oridest",
     numeric_or_slider,
     selectInput("oridest_sector", "Selecciona el sector:", choices = SECTORS),
-    numericInput("oridest_invest", "Ingresa el monto a invertir en USD:", value = 0, min = 0),
+    numericInput("oridest_invest", "Ingresa el monto a invertir en USD: (Si deseas ingresarlo en miles de dolares puedes usa e3 al final de la cantidad, por ejemplo 100e3 serían 100,000 USD)", value = 0, min = 0),
   ),
   tabPanel(
     "mode_shocks",
@@ -125,6 +125,15 @@ mode_params <- tabsetPanel(
 # UI ----
 
 ui <- fluidPage(
+  h1("Calculadora Insumo Producto Sinaloa"),
+  p("
+    Incluye dos modos, el primer modo desgloza la inversión a traves de
+    las Matrices de Origen y Destino (https://www.inegi.org.mx/programas/tod/2018/#tabulados).
+    Este modo necesita el monto a invertir en USD y seleccionar en que sector se realizará la inversión.
+    Se puede hacer un desgloce más fino al especificar cuanto del capital se quedará dentro de Sinaloa y cuanto fuera.
+    El segundo modo da total control al permitir desglozar la inversión de cualquier manera.
+    IMPORTANTE: en este modo las cantidades a ingresar están en millones de pesos.
+    "),
   select_mode,
   textInput("experiment_name", "Nombre del Experimento"),
   numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0),
@@ -266,12 +275,16 @@ server <- function(input, output) {
     out
   })
 
+  results <- reactive({
+    bind_cols(template(), raw_results())
+  })
+
   # output$input_tab <- renderDataTable(
   #   template()
   # )
 
   output$output_tab <- renderDataTable(
-    raw_results()
+    results()
   )
 
   # output$debug <- renderText(empleos())
