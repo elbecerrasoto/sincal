@@ -48,15 +48,28 @@ stopifnot(
     all(near(cs, 1) | near(cs, 0))
 )
 
+MODE_EFFECTS <- "mode_effects"
+
 # UI helpers ----
 
-select_mode <- radioButtons("template_mode",
-  "Seleciona el modo a utilizar:",
-  choiceNames = c(
-    "Modo 1: Generar inversiones a partir de las matrices de Origen y Destino.",
-    "Modo 2: Generar inversiones a partir de ingresar manualmente los choques en la demanda final."
+select_mode <- list(
+  radioButtons("template_mode",
+    "Seleciona el modo a utilizar:",
+    choiceNames = c(
+      "Modo 1: Generar inversiones a partir de las matrices de Origen y Destino.",
+      "Modo 2: Generar inversiones a partir de ingresar manualmente los choques en la demanda final."
+    ),
+    choiceValues = c(MODE_ORIDEST, "mode_shocks")
   ),
-  choiceValues = c(MODE_ORIDEST, "mode_shocks")
+  radioButtons("effect_breakdown",
+    "Deseas desglozar los resultados en efectos directos, indirectos, de desbordamiento y de retroalimentaión:",
+    choiceNames = c(
+      "Sí. (Genera tablas con muchas columnas)",
+      "No. (Los efectos pueden ser calculados manualment a partir de los porcentajes dados)"
+    ),
+    choiceValues = c(MODE_EFFECTS, glue("{MODE_EFFECTS}_NO")),
+    selected = glue("{MODE_EFFECTS}_NO")
+  )
 )
 
 numeric_or_slider <- radioButtons("numericORslider",

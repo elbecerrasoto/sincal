@@ -25,7 +25,7 @@ get_biregional <- function(sinaloa) {
       \(x) x / row_totals
     ))
 
-  biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_percent"))
+  biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_porcentaje"))
 
   biregional_percents
 }
