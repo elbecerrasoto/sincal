@@ -1,7 +1,8 @@
 library(shiny)
 library(tidyverse)
 library(glue)
-library(DT)
+# library(DT)
+# library(bs4Dash)
 source("app_helper.R")
 
 # globals ----
@@ -140,13 +141,12 @@ ui <- fluidPage(
       textInput("experiment_name", "Nombre del Experimento"),
       numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0)
     ),
-    mainPanel(),
+    mainPanel(uiOutput("totals")),
   ),
   mode_params,
   uiOutput("splits"),
-  dataTableOutput("input_tab"),
-  dataTableOutput("output_tab"),
-  # verbatimTextOutput("debug")
+  h1("Tabla de Resultados"),
+  DT::dataTableOutput("output_tab"),
 )
 
 # server ----
@@ -288,11 +288,23 @@ server <- function(input, output) {
   #   template()
   # )
 
-  # output$output_tab <- renderDataTable(
-  #   results()
-  # )
+  output$totals <- renderUI({
+    list(
+      bs4Dash::valueBox(
+        value = pib() |> sum() |> round(ROUND),
+        subtitle = "Impacto en el PIB en millones de pesos",
+      ),
+      bs4Dash::valueBox(
+        value = empleos()$empleos |> sum() |> round(ROUND),
+        subtitle = "Impacto en el Empleo en número de empleos generados",
+      )
+    )
+  })
 
-  # output$debug <- renderText(empleos())
+
+  output$output_tab <- DT::renderDataTable({
+    results()
+  })
 }
 
 shinyApp(ui = ui, server = server)
