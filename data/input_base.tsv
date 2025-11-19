@@ -1,7 +1,7 @@
 experiment_name	date	use_origen_destino	origen_destino_sector	origen_destino_structure	split	investment_usd	exrate	shocks_millones_mxn	sector	region	scian
 NA	NA	NA	NA	NA	NA	NA	NA	NA	agricultura	sinaloa	111
 NA	NA	NA	NA	NA	NA	NA	NA	NA	explotacion_animal	sinaloa	112
-NA	NA	NA	NA	NA	NA	NA	NA	NA	agropecuario_forestal	sinaloa	113,115
+NA	NA	NA	NA	NA	NA	NA	NA	NA	agropecuario_forestal	sinaloa	113.115
 NA	NA	NA	NA	NA	NA	NA	NA	NA	pesca_caza	sinaloa	114
 NA	NA	NA	NA	NA	NA	NA	NA	NA	mineria_petrolera	sinaloa	211
 NA	NA	NA	NA	NA	NA	NA	NA	NA	mineria_no_petrolera	sinaloa	212
@@ -36,7 +36,7 @@ NA	NA	NA	NA	NA	NA	NA	NA	NA	otros_servicios_excepto_gubernamentales	sinaloa	81
 NA	NA	NA	NA	NA	NA	NA	NA	NA	servicios_gubernamentales	sinaloa	93
 NA	NA	NA	NA	NA	NA	NA	NA	NA	agricultura	fuera_sinaloa	111
 NA	NA	NA	NA	NA	NA	NA	NA	NA	explotacion_animal	fuera_sinaloa	112
-NA	NA	NA	NA	NA	NA	NA	NA	NA	agropecuario_forestal	fuera_sinaloa	113,115
+NA	NA	NA	NA	NA	NA	NA	NA	NA	agropecuario_forestal	fuera_sinaloa	113.115
 NA	NA	NA	NA	NA	NA	NA	NA	NA	pesca_caza	fuera_sinaloa	114
 NA	NA	NA	NA	NA	NA	NA	NA	NA	mineria_petrolera	fuera_sinaloa	211
 NA	NA	NA	NA	NA	NA	NA	NA	NA	mineria_no_petrolera	fuera_sinaloa	212
