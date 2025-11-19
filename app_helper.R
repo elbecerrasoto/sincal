@@ -11,10 +11,10 @@ get_employment_matrices <- function(employment, sinaloa) {
 
 get_biregional <- function(sinaloa) {
   biregional_multipliers <- tibble(
-    directos = rep(1, N_SECTORS),
-    indirectos = colSums(SINALOA$M1a),
-    desbordamiento = colSums(SINALOA$M2a),
-    retroalimentacion = colSums(SINALOA$M3a)
+    directos = rep(1, length(sinaloa$x)),
+    indirectos = colSums(sinaloa$M1a),
+    desbordamiento = colSums(sinaloa$M2a),
+    retroalimentacion = colSums(sinaloa$M3a)
   )
 
   row_totals <- rowSums(biregional_multipliers)
