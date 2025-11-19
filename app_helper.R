@@ -25,13 +25,23 @@ get_biregional <- function(sinaloa) {
       \(x) x / row_totals
     ))
 
-  # biregional_percents <- biregional_percents |> rename_with(~ glue("{.x}_porcentaje"))
-
   biregional_percents
 }
 
 
-
+breakdown_results_into_effects <- function(effects_percents, leontief_results) {
+  imap(
+    effects_percents,
+    function(brcol, brcol_name) {
+      leontief_results |>
+        mutate(across(
+          everything(),
+          ~ .x * brcol
+        )) |>
+        rename_with(~ paste0(brcol_name, "_", .x))
+    }
+  )
+}
 
 get_sector_structure <- function(origen_destino_all) {
   origen_destino <- reduce(origen_destino_all, `+`)

@@ -258,18 +258,7 @@ server <- function(input, output) {
       relocate(pib)
 
     if (input$effect_breakdown == MODE_EFFECTS) {
-      breffects <- imap(
-        BIREGIONAL,
-        function(brcol, brcol_name) {
-          results_intermediate |>
-            mutate(across(
-              everything(),
-              ~ .x * brcol
-            )) |>
-            rename_with(~ paste0(brcol_name, "_", .x))
-        }
-      )
-
+      breffects <- breakdown_results_into_effects(BIREGIONAL, results_intermediate)
       out <- bind_cols(results_intermediate, BIREGIONAL, breffects)
     } else {
       out <- bind_cols(results_intermediate, BIREGIONAL)
