@@ -301,7 +301,7 @@ server <- function(input, output) {
       )
     }
 
-    c(
+    list(
       fluidRow(
         column(6, ui_value_box(pib, "Impacto en el PIB en millones de pesos")),
         column(6, ui_value_box(empleos, "Impacto en el número de empleos"))
