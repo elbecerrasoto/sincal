@@ -289,14 +289,30 @@ server <- function(input, output) {
   # )
 
   output$totals <- renderUI({
-    list(
+    pib <- pib()
+    empleos <- empleos()$empleos
+
+    N <- length(pib)
+
+    ui_value_box <- function(value, legend) {
       bs4Dash::valueBox(
-        value = pib() |> sum() |> round(ROUND),
-        subtitle = "Impacto en el PIB en millones de pesos",
+        value = value |> sum() |> round(ROUND),
+        subtitle = legend
+      )
+    }
+
+    c(
+      fluidRow(
+        column(6, ui_value_box(pib, "Impacto en el PIB en millones de pesos")),
+        column(6, ui_value_box(empleos, "Impacto en el número de empleos"))
       ),
-      bs4Dash::valueBox(
-        value = empleos()$empleos |> sum() |> round(ROUND),
-        subtitle = "Impacto en el Empleo en número de empleos generados",
+      fluidRow(
+        column(6, ui_value_box(pib[1:(N / 2)], "Sinaloa:\nImpacto en el PIB en millones de pesos")),
+        column(6, ui_value_box(pib[(N / 2 + 1):N], "Resto del País:\nImpacto en el PIB en millones de pesos"))
+      ),
+      fluidRow(
+        column(6, ui_value_box(empleos[1:(N / 2)], "Sinaloa:\nImpacto en el número de empleos")),
+        column(6, ui_value_box(empleos[(N / 2 + 1):N], "Resto del País:\nImpacto en el número de empleos"))
       )
     )
   })
