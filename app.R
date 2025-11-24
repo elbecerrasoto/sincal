@@ -29,6 +29,7 @@ TSIN_ALL <- EMPLOYMENT |>
 
 # Input template
 TEMPLATE <- read_tsv(TEMPLATE_PATH)
+SHOCKS_COL_NAME <- names(TEMPLATE)[[9]]
 
 BIREGIONAL <- get_biregional(SINALOA)
 
@@ -37,6 +38,7 @@ SECTORS <- unique(TEMPLATE$sector)
 
 # Shiny Flags
 MODE_ORIDEST <- "mode_oridest" # Flag for Origen y Destino Mode
+MODE_SHOCKS <- "mode_shocks"
 MODE_SLIDER <- "slider" # Flag for Slider Activation
 MODE_EFFECTS <- "mode_effects" # Flag for adding the effects to the result table
 
@@ -60,7 +62,7 @@ select_mode <- list(
       "Modo 1: Generar inversiones a partir de las matrices de Origen y Destino.",
       "Modo 2: Generar inversiones a partir de ingresar manualmente los choques en la demanda final."
     ),
-    choiceValues = c(MODE_ORIDEST, "mode_shocks")
+    choiceValues = c(MODE_ORIDEST, MODE_SHOCKS)
   ),
   radioButtons("effect_breakdown",
     "Deseas desglozar los resultados en efectos directos, indirectos, de desbordamiento y de retroalimentaión:",
@@ -134,6 +136,9 @@ ui <- fluidPage(
     Se puede hacer un desgloce más fino al especificar cuanto del capital se quedará dentro de Sinaloa y cuanto fuera.
     El segundo modo da total control al permitir desglozar la inversión de cualquier manera.
     IMPORTANTE: en este modo las cantidades a ingresar están en millones de pesos.
+    También se puede subir un archivo \".tsv\" con una columna llamada \"shocks_millones_mxn\",
+    por ejemplo un resultado anteriormente calculado y editado manualmente en programas de hoja de cálculo.
+    Al hacer esto los valores se ingresaran automáticamente en el Modo 2.
     "),
   sidebarLayout(
     sidebarPanel(
@@ -141,7 +146,11 @@ ui <- fluidPage(
       textInput("experiment_name", "Nombre del Experimento"),
       numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0)
     ),
-    mainPanel(uiOutput("totals"), downloadButton("download", "Descargar Resultados")),
+    mainPanel(
+      uiOutput("totals"),
+      fileInput("uploaded", "Ingresar los shocks en millones de pesos a través de subir un archivo tsv:", accept = ".tsv"),
+      downloadButton("download", "Descargar Resultados")
+    ),
   ),
   mode_params,
   uiOutput("splits"),
@@ -284,9 +293,6 @@ server <- function(input, output, session) {
     bind_cols(template(), raw_results())
   })
 
-  # output$input_tab <- renderDataTable(
-  #   template()
-  # )
 
   output$totals <- renderUI({
     pib <- pib()
@@ -334,6 +340,52 @@ server <- function(input, output, session) {
   observeEvent(captured_splits(), {
     manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
     main_shocks_V <- main_shocks()
+
+    for (idx in seq_along(manual_shocks_ids)) {
+      input_id <- manual_shocks_ids[[idx]]
+      new_value <- main_shocks_V[[idx]]
+
+      updateNumericInput(
+        session = session,
+        inputId = input_id,
+        value = new_value
+      )
+    }
+  })
+
+  uploaded_shocks <- reactive({
+    req(input$uploaded)
+
+    path <- input$uploaded$datapath
+
+    uploaded <- read_tsv(path)
+
+    correct_name <- SHOCKS_COL_NAME %in% names(uploaded)
+    correct_size <- nrow(uploaded) == length(SECTORS)
+    uploaded_shocks <- uploaded |> pull(all_of(SHOCKS_COL_NAME))
+    correct_type <- is.numeric(uploaded_shocks)
+
+    validate(
+      need(correct_name, glue("Data does not contain a column named {SHOCKS_COL_NAME}")),
+      need(correct_size, glue("The {SHOCKS_COL_NAME} column must be of size {length(SECTORS)}")),
+      need(correct_type, glue("The {SHOCKS_COL_NAME} column must be numeric."))
+    )
+
+    uploaded_shocks
+  })
+
+  observeEvent(uploaded_shocks(), , {
+    updateSelectInput(
+      session = session,
+      inputId = "template_mode",
+      selected = MODE_SHOCKS
+    )
+  })
+
+  observeEvent(uploaded_shocks(), {
+    req(input$uploaded)
+    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+    main_shocks_V <- uploaded_shocks()
 
     for (idx in seq_along(manual_shocks_ids)) {
       input_id <- manual_shocks_ids[[idx]]
