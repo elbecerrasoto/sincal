@@ -151,7 +151,7 @@ ui <- fluidPage(
 
 # server ----
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   observeEvent(input$template_mode, {
     updateTabsetPanel(inputId = "mode_params", selected = input$template_mode)
   })
@@ -329,6 +329,22 @@ server <- function(input, output) {
     results() |>
       select(shocks_millones_mxn:last_col()) |>
       select(-directos, -indirectos, -desbordamiento, -retroalimentacion)
+  })
+
+  observeEvent(captured_splits(), {
+    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+    main_shocks_V <- main_shocks()
+
+    for (idx in seq_along(manual_shocks_ids)) {
+      input_id <- manual_shocks_ids[[idx]]
+      new_value <- main_shocks_V[[idx]]
+
+      updateNumericInput(
+        session = session,
+        inputId = input_id,
+        value = new_value
+      )
+    }
   })
 }
 
