@@ -326,7 +326,9 @@ server <- function(input, output) {
   )
 
   output$output_tab <- DT::renderDataTable({
-    results()
+    results() |>
+      select(shocks_millones_mxn:last_col()) |>
+      select(-directos, -indirectos, -desbordamiento, -retroalimentacion)
   })
 }
 
