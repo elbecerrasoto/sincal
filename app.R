@@ -378,14 +378,14 @@ server <- function(input, output, session) {
 
   output$debug <- renderText(uploaded_shocks())
 
-  # observeEvent(uploaded_shocks(), , {
-  #   updateSelectInput(
-  #     session = session,
-  #     inputId = "template_mode",
-  #     selected = MODE_SHOCKS
-  #   )
-  # })
-  #
+  observeEvent(uploaded_shocks(), {
+    updateSelectInput(
+      session = session,
+      inputId = "template_mode",
+      selected = MODE_SHOCKS
+    )
+  })
+
   # observeEvent(uploaded_shocks(), {
   #   req(input$uploaded)
   #   manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
