@@ -1,0 +1,79 @@
+scian_ori	text_ori	scian_bir	text_bir
+111 	 Agricultura	111 	 Agricultura
+112 	 Cría y explotación de animales	112 	 Cría y explotación de animales
+114 	 Pesca, caza y captura	114 	 Pesca, caza y captura
+113 	 Aprovechamiento forestal	113,115 	 Aprovechamiento forestal, Servicios relacionados con las actividades agropecuarias y forestales
+115 	 Servicios relacionados con las actividades agropecuarias y forestales	113,115 	 Aprovechamiento forestal, Servicios relacionados con las actividades agropecuarias y forestales
+211 	 Extracción de petróleo y gas	21-1	Mineria petrolera
+212 	 Minería de minerales metálicos y no metálicos, excepto petróleo y gas	21-2	Mineria no petrolera
+213 	 Servicios relacionados con la minería	21-2	Mineria no petrolera
+221 	 Generación, transmisión, distribución y comercialización de energía eléctrica, suministro de agua y de gas natural por ductos al consumidor final	22 	 Generacion, transmision, distribucion y comercializacion de energia electrica, suministro de agua y de gas natural por ductos al consumidor final
+236 	 Edificación	23 	 Construccion
+237 	 Construcción de obras de ingeniería civil	23 	 Construccion
+238 	 Trabajos especializados para la construcción	23 	 Construccion
+311 	 Industria alimentaria	311 	 Industria alimentaria
+312 	 Industria de las bebidas y del tabaco	312 	 Industria de las bebidas y del tabaco
+313 	 Fabricación de insumos textiles y acabado de textiles	313-314	Fabricacion de insumos textiles y acabado de textiles; Fabricacion de productos textiles, excepto prendas de vestir
+314 	 Fabricación de productos textiles, excepto prendas de vestir	313-314	Fabricacion de insumos textiles y acabado de textiles; Fabricacion de productos textiles, excepto prendas de vestir
+315 	 Fabricación de prendas de vestir	315-316	Fabricacion de prendas de vestir; Curtido y acabado de cuero y piel, y fabricacion de productos de cuero, piel y materiales sucedaneos
+316 	 Curtido y acabado de cuero y piel, y fabricación de productos de cuero, piel y materiales sucedáneos	315-316	Fabricacion de prendas de vestir; Curtido y acabado de cuero y piel, y fabricacion de productos de cuero, piel y materiales sucedaneos
+321 	 Industria de la madera	321 	 Industria de la madera
+322 	 Industria del papel	322-323	Industria del papel; Impresión e industrias conexas
+323 	 Impresión e industrias conexas	322-323	Industria del papel; Impresión e industrias conexas
+324 	 Fabricación de productos derivados del petróleo y del carbón	324-326	Fabricacion de productos derivados del petroleo y del carbon; Industria quimica; Industria del plastico y del hule
+325 	 Industria química	324-326	Fabricacion de productos derivados del petroleo y del carbon; Industria quimica; Industria del plastico y del hule
+326 	 Industria del plástico y del hule	324-326	Fabricacion de productos derivados del petroleo y del carbon; Industria quimica; Industria del plastico y del hule
+327 	 Fabricación de productos a base de minerales no metálicos	327 	 Fabricacion de productos a base de minerales no metalicos
+331 	 Industrias metálicas básicas	331-332	Industrias metalicas basicas; Fabricacion de productos metalicos
+332 	 Fabricación de productos metálicos	331-332	Industrias metalicas basicas; Fabricacion de productos metalicos
+333 	 Fabricación de maquinaria y equipo	333-336	Fabricacion de maquinaria y equipo; Fabricacion de equipo de computacion, comunicacion, medicion y de otros equipos, componentes y accesorios electronicos; Fabricacion de accesorios, aparatos electricos y equipo de generacion de energia electrica; Fabricacion de equipo de transporte
+334 	 Fabricación de equipo de computación, comunicación, medición y de otros equipos, componentes y accesorios electrónicos	333-336	Fabricacion de maquinaria y equipo; Fabricacion de equipo de computacion, comunicacion, medicion y de otros equipos, componentes y accesorios electronicos; Fabricacion de accesorios, aparatos electricos y equipo de generacion de energia electrica; Fabricacion de equipo de transporte
+335 	 Fabricación de accesorios, aparatos eléctricos y equipo de generación de energía eléctrica	333-336	Fabricacion de maquinaria y equipo; Fabricacion de equipo de computacion, comunicacion, medicion y de otros equipos, componentes y accesorios electronicos; Fabricacion de accesorios, aparatos electricos y equipo de generacion de energia electrica; Fabricacion de equipo de transporte
+336 	 Fabricación de equipo de transporte	333-336	Fabricacion de maquinaria y equipo; Fabricacion de equipo de computacion, comunicacion, medicion y de otros equipos, componentes y accesorios electronicos; Fabricacion de accesorios, aparatos electricos y equipo de generacion de energia electrica; Fabricacion de equipo de transporte
+337 	 Fabricación de muebles, colchones y persianas	337 	 Fabricacion de muebles, colchones y persianas
+339 	 Otras industrias manufactureras	339 	 Otras industrias manufactureras
+431 	 Comercio al por mayor de abarrotes, alimentos, bebidas, hielo y tabaco	43 	 Comercio al por mayor
+461 	 Comercio al por menor de abarrotes, alimentos, bebidas, hielo y tabaco	46 	 Comercio al por menor
+481 	 Transporte aéreo	48-49	Transportes, correos y almacenamiento
+482 	 Transporte por ferrocarril	48-49	Transportes, correos y almacenamiento
+483 	 Transporte por agua	48-49	Transportes, correos y almacenamiento
+484 	 Autotransporte de carga	48-49	Transportes, correos y almacenamiento
+485 	 Transporte terrestre de pasajeros, excepto por ferrocarril	48-49	Transportes, correos y almacenamiento
+486 	 Transporte por ductos	48-49	Transportes, correos y almacenamiento
+487 	 Transporte turístico	48-49	Transportes, correos y almacenamiento
+488 	 Servicios relacionados con el transporte	48-49	Transportes, correos y almacenamiento
+491 	 Servicios postales	48-49	Transportes, correos y almacenamiento
+492 	 Servicios de mensajería y paquetería	48-49	Transportes, correos y almacenamiento
+493 	 Servicios de almacenamiento	48-49	Transportes, correos y almacenamiento
+511 	 Edición de periódicos, revistas, libros, software y otros materiales, y edición de estas publicaciones integrada con la impresión	51 	 Informacion en medios masivos
+512 	 Industria fílmica y del video, e industria del sonido	51 	 Informacion en medios masivos
+515 	 Radio y televisión	51 	 Informacion en medios masivos
+517 	 Telecomunicaciones	51 	 Informacion en medios masivos
+518 	 Procesamiento electrónico de información, hospedaje y otros servicios relacionados	51 	 Informacion en medios masivos
+519 	 Otros servicios de información' : '51 - Informacion en medios masivos	51 	 Informacion en medios masivos
+521 	 Banca central	52 	 Servicios financieros y de seguros
+522 	 Instituciones de intermediación crediticia y financiera no bursátil	52 	 Servicios financieros y de seguros
+523 	 Actividades bursátiles, cambiarias y de inversión financiera	52 	 Servicios financieros y de seguros
+524 	 Compañías de seguros, fianzas, y administración de fondos para el retiro	52 	 Servicios financieros y de seguros
+531 	 Servicios inmobiliarios	53 	 Servicios inmobiliarios y de alquiler de bienes muebles e intangibles
+532 	 Servicios de alquiler de bienes muebles	53 	 Servicios inmobiliarios y de alquiler de bienes muebles e intangibles
+533 	 Servicios de alquiler de marcas registradas, patentes y franquicias	53 	 Servicios inmobiliarios y de alquiler de bienes muebles e intangibles
+541 	 Servicios profesionales, científicos y técnicos	54 	 Servicios profesionales, cientificos y tecnicos
+551 	 Corporativos	55 	 Corporativos
+561 	 Servicios de apoyo a los negocios	56 	 Servicios de apoyo a los negocios y manejo de residuos, y servicios de remediación
+562 	 Manejo de residuos y servicios de remediación	56 	 Servicios de apoyo a los negocios y manejo de residuos, y servicios de remediación
+611 	 Servicios educativos	61 	 Servicios educativos
+621 	 Servicios médicos de consulta externa y servicios relacionados	62 	 Servicios de salud y de asistencia social
+622 	 Hospitales	62 	 Servicios de salud y de asistencia social
+623 	 Residencias de asistencia social y para el cuidado de la salud	62 	 Servicios de salud y de asistencia social
+624 	 Otros servicios de asistencia social	62 	 Servicios de salud y de asistencia social
+711 	 Servicios artísticos, culturales y deportivos, y otros servicios relacionados	71 	 Servicios de esparcimiento culturales y deportivos, y otros servicios recreativos
+712 	 Museos, sitios históricos, zoológicos y similares	71 	 Servicios de esparcimiento culturales y deportivos, y otros servicios recreativos
+713 	 Servicios de entretenimiento en instalaciones recreativas y otros servicios recreativos	71 	 Servicios de esparcimiento culturales y deportivos, y otros servicios recreativos
+721 	 Servicios de alojamiento temporal	72 	 Servicios de alojamiento temporal y de preparacion de alimentos y bebidas
+722 	 Servicios de preparación de alimentos y bebidas	72 	 Servicios de alojamiento temporal y de preparacion de alimentos y bebidas
+811 	 Servicios de reparación y mantenimiento	81 	 Otros servicios excepto actividades gubernamentales
+812 	 Servicios personales	81 	 Otros servicios excepto actividades gubernamentales
+813 	 Asociaciones y organizaciones	81 	 Otros servicios excepto actividades gubernamentales
+814 	 Hogares con empleados domésticos	81 	 Otros servicios excepto actividades gubernamentales
+931 	 Actividades legislativas, gubernamentales y de impartición de justicia	93 	 Actividades legislativas, gubernamentales, de imparticion de justicia y de organismos internacionales y extraterritoriales
