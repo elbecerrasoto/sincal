@@ -153,7 +153,6 @@ ui <- fluidPage(
     mainPanel(
       uiOutput("totals"),
       fileInput("uploaded", "Ingresar los shocks en millones de pesos a través de subir un archivo tsv:", accept = ".tsv"),
-      verbatimTextOutput("debug"),
       downloadButton("download", "Descargar Resultados")
     ),
   ),
@@ -415,8 +414,6 @@ server <- function(input, output, session) {
   })
 
 
-  output$debug <- renderText(uploaded_shocks())
-
   observeEvent(uploaded_shocks(), {
     updateSelectInput(
       session = session,
@@ -425,22 +422,21 @@ server <- function(input, output, session) {
     )
   })
 
-  # observeEvent(uploaded_shocks(), {
-  #   req(input$uploaded)
-  #   manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-  #   main_shocks_V <- uploaded_shocks()
-  #
-  #   for (idx in seq_along(manual_shocks_ids)) {
-  #     input_id <- manual_shocks_ids[[idx]]
-  #     new_value <- main_shocks_V[[idx]]
-  #
-  #     updateNumericInput(
-  #       session = session,
-  #       inputId = input_id,
-  #       value = new_value
-  #     )
-  #   }
-  # })
+  observeEvent(uploaded_shocks(), {
+    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+    main_shocks_V <- uploaded_shocks()
+
+    for (idx in seq_along(manual_shocks_ids)) {
+      input_id <- manual_shocks_ids[[idx]]
+      new_value <- main_shocks_V[[idx]]
+
+      updateNumericInput(
+        session = session,
+        inputId = input_id,
+        value = new_value
+      )
+    }
+  })
 }
 
 shinyApp(ui = ui, server = server)
