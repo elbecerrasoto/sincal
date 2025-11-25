@@ -1,8 +1,11 @@
 library(shiny)
 library(tidyverse)
 library(glue)
-# library(DT)
-# library(bs4Dash)
+# library(DT) # masking errors
+# library(bs4Dash) # masking errors
+# library(shinyFeedback)
+
+
 source("app_helper.R")
 
 # globals ----
@@ -128,6 +131,7 @@ mode_params <- tabsetPanel(
 # UI ----
 
 ui <- fluidPage(
+  shinyFeedback::useShinyFeedback(),
   h1("Calculadora Insumo Producto Sinaloa"),
   p("
     Incluye dos modos, el primer modo desgloza la inversión a traves de
@@ -354,27 +358,62 @@ server <- function(input, output, session) {
     }
   })
 
-  uploaded_shocks <- reactive({
-    req(input$uploaded)
 
+  non_validated <- reactive({
+    req(input$uploaded)
     path <- input$uploaded$datapath
+
+    tryCatch(read_tsv(path), error = \(e) NULL)
+  })
+
+
+  observeEvent(non_validated(), {
+    uploaded <- non_validated()
+    rep(is_tibble(uploaded))
+
     n_sectors <- length(TEMPLATE$sector)
 
-    uploaded <- read_tsv(path)
     uploaded_shocks <- uploaded[[SHOCKS_COL_NAME]]
 
     correct_name <- SHOCKS_COL_NAME %in% names(uploaded)
     correct_size <- nrow(uploaded) == length(TEMPLATE$sector)
-    correct_type <- is.numeric(uploaded_shocks)
+    correct_type <- is.numeric(uploaded_shocks) && all(uploaded_shocks >= 0)
+
+    shinyFeedback::hideFeedback("uploaded")
+
+    err_name <- glue("No existe {SHOCKS_COL_NAME}")
+    err_size <- glue("{SHOCKS_COL_NAME} debe medir {n_sectors}")
+    err_type <- glue("{SHOCKS_COL_NAME} NO es >= 0")
+
+    # rstyler: off
+      if      (!correct_name) shinyFeedback::feedbackDanger("uploaded", TRUE, err_name)
+      else if (!correct_size) shinyFeedback::feedbackDanger("uploaded", TRUE, err_size)
+      else if (!correct_type) shinyFeedback::feedbackDanger("uploaded", TRUE, err_type)
+      else shinyFeedback::feedbackSuccess("uploaded", TRUE, "Carga Completada")
+    # rstyler: on
+  })
+
+
+
+  uploaded_shocks <- reactive({
+    uploaded <- non_validated()
+    rep(is_tibble(uploaded))
+
+    n_sectors <- length(TEMPLATE$sector)
+
+    uploaded_shocks <- uploaded[[SHOCKS_COL_NAME]]
+
+    correct_name <- SHOCKS_COL_NAME %in% names(uploaded)
+    correct_size <- nrow(uploaded) == length(TEMPLATE$sector)
+    correct_type <- is.numeric(uploaded_shocks) && all(uploaded_shocks >= 0)
 
     validate(
-      need(correct_name, glue("Data does not contain a column named {SHOCKS_COL_NAME}.")),
-      need(correct_size, glue("The {SHOCKS_COL_NAME} column must be of size {n_sectors}.")),
-      need(correct_type, glue("The {SHOCKS_COL_NAME} column must be numeric."))
+      need(correct_name && correct_size && correct_type, "Error, por favor revisa tu datos de entrada")
     )
 
     uploaded_shocks
   })
+
 
   output$debug <- renderText(uploaded_shocks())
 
