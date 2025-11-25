@@ -149,13 +149,14 @@ ui <- fluidPage(
     mainPanel(
       uiOutput("totals"),
       fileInput("uploaded", "Ingresar los shocks en millones de pesos a través de subir un archivo tsv:", accept = ".tsv"),
+      verbatimTextOutput("debug"),
       downloadButton("download", "Descargar Resultados")
     ),
   ),
   mode_params,
   uiOutput("splits"),
   h1("Tabla de Resultados"),
-  DT::dataTableOutput("output_tab"),
+  DT::dataTableOutput("output_tab")
 )
 
 # server ----
@@ -357,47 +358,50 @@ server <- function(input, output, session) {
     req(input$uploaded)
 
     path <- input$uploaded$datapath
+    n_sectors <- length(TEMPLATE$sector)
 
     uploaded <- read_tsv(path)
+    uploaded_shocks <- uploaded[[SHOCKS_COL_NAME]]
 
     correct_name <- SHOCKS_COL_NAME %in% names(uploaded)
-    correct_size <- nrow(uploaded) == length(SECTORS)
-    uploaded_shocks <- uploaded |> pull(all_of(SHOCKS_COL_NAME))
+    correct_size <- nrow(uploaded) == length(TEMPLATE$sector)
     correct_type <- is.numeric(uploaded_shocks)
 
     validate(
-      need(correct_name, glue("Data does not contain a column named {SHOCKS_COL_NAME}")),
-      need(correct_size, glue("The {SHOCKS_COL_NAME} column must be of size {length(SECTORS)}")),
+      need(correct_name, glue("Data does not contain a column named {SHOCKS_COL_NAME}.")),
+      need(correct_size, glue("The {SHOCKS_COL_NAME} column must be of size {n_sectors}.")),
       need(correct_type, glue("The {SHOCKS_COL_NAME} column must be numeric."))
     )
 
     uploaded_shocks
   })
 
-  observeEvent(uploaded_shocks(), , {
-    updateSelectInput(
-      session = session,
-      inputId = "template_mode",
-      selected = MODE_SHOCKS
-    )
-  })
+  output$debug <- renderText(uploaded_shocks())
 
-  observeEvent(uploaded_shocks(), {
-    req(input$uploaded)
-    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-    main_shocks_V <- uploaded_shocks()
-
-    for (idx in seq_along(manual_shocks_ids)) {
-      input_id <- manual_shocks_ids[[idx]]
-      new_value <- main_shocks_V[[idx]]
-
-      updateNumericInput(
-        session = session,
-        inputId = input_id,
-        value = new_value
-      )
-    }
-  })
+  # observeEvent(uploaded_shocks(), , {
+  #   updateSelectInput(
+  #     session = session,
+  #     inputId = "template_mode",
+  #     selected = MODE_SHOCKS
+  #   )
+  # })
+  #
+  # observeEvent(uploaded_shocks(), {
+  #   req(input$uploaded)
+  #   manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+  #   main_shocks_V <- uploaded_shocks()
+  #
+  #   for (idx in seq_along(manual_shocks_ids)) {
+  #     input_id <- manual_shocks_ids[[idx]]
+  #     new_value <- main_shocks_V[[idx]]
+  #
+  #     updateNumericInput(
+  #       session = session,
+  #       inputId = input_id,
+  #       value = new_value
+  #     )
+  #   }
+  # })
 }
 
 shinyApp(ui = ui, server = server)
