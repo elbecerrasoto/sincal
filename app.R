@@ -1,11 +1,11 @@
 library(shiny)
 library(tidyverse)
 library(glue)
-# library(DT) # masking errors
-# library(bs4Dash) # masking errors
-# library(shinyFeedback)
+library(DT)
+library(bs4Dash)
+library(shinyFeedback)
 
-
+# Load your helper functions
 source("app_helper.R")
 
 # globals ----
@@ -20,6 +20,7 @@ ROUND <- 2 # Rounding of numbers for printing
 MIP_SCALE <- 1e6 # The scale input of the MIP, in this case millions of MXN
 
 # Leontieff Stuff
+# Note: get_ZAB_LG_fx_Madds is likely in helper.R (sourced by app_helper.R)
 SINALOA <- read_tsv(MIP_PATH) |>
   get_ZAB_LG_fx_Madds()
 
@@ -60,18 +61,18 @@ stopifnot(
 
 select_mode <- list(
   radioButtons("template_mode",
-    "Seleciona el modo a utilizar:",
+    "Modo de Operación:",
     choiceNames = c(
-      "Modo 1: Generar inversiones a partir de las matrices de Origen y Destino.",
-      "Modo 2: Generar inversiones a partir de ingresar manualmente los choques en la demanda final."
+      "Modo 1: Inversión (Origen/Destino)",
+      "Modo 2: Choques Manuales"
     ),
     choiceValues = c(MODE_ORIDEST, MODE_SHOCKS)
   ),
   radioButtons("effect_breakdown",
-    "Deseas desglozar los resultados en efectos directos, indirectos, de desbordamiento y de retroalimentaión:",
+    "Desglose de Resultados:",
     choiceNames = c(
-      "Sí. (Genera tablas con muchas columnas)",
-      "No. (Los efectos pueden ser calculados manualment a partir de los porcentajes dados)"
+      "Sí (Directos, Indirectos, etc.)",
+      "No (Solo totales)"
     ),
     choiceValues = c(MODE_EFFECTS, glue("{MODE_EFFECTS}_NO")),
     selected = glue("{MODE_EFFECTS}_NO")
@@ -79,87 +80,173 @@ select_mode <- list(
 )
 
 numeric_or_slider <- radioButtons("numericORslider",
-  "¿Cómo deseas ingresear los valores?",
+  "Tipo de Entrada:",
   choiceNames = c(
-    "A través de una barra deslizante\n(primera vez, fácil de usar, prototipado).",
-    "A través de teclear los valores\n(exactitud, corrida final)."
+    "Barra Deslizante (Slider)",
+    "Numérico (Teclado)"
   ),
-  choiceValues = c(MODE_SLIDER, "numeric")
+  choiceValues = c(MODE_SLIDER, "numeric"),
+  inline = TRUE
 )
 
+# Inputs for Mode 2 (Manual)
 input_sectors_sinaloa <- SECTORS |>
   map(\(sector)
   numericInput(glue("{sector}_sinaloa"),
-    glue(
-      "SINALOA: {str_to_upper(sector)}
-                     Cantidad demandada dentro de Sinaloa en millones de pesos
-                     del sector {sector}"
-    ),
+    glue("SINALOA: {sector}"),
     value = 0, min = 0
   ))
-
 
 input_sectors_mexico <- SECTORS |>
   map(\(sector)
   numericInput(glue("{sector}_mexico"),
-    glue(
-      "MEXICO: {str_to_upper(sector)}
-                     Cantidad demandada fuera de Sinaloa en millones de pesos
-                     del sector {sector}"
-    ),
+    glue("RESTO PAÍS: {sector}"),
     value = 0, min = 0
   ))
 
+# The hidden logic panel (Wizard)
 mode_params <- tabsetPanel(
   id = "mode_params",
   type = "hidden",
+  # Panel 1: Mode Origen Destino
   tabPanel(
     "mode_oridest",
-    numeric_or_slider,
-    selectInput("oridest_sector", "Selecciona el sector:", choices = SECTORS),
-    numericInput("oridest_invest", "Ingresa el monto a invertir en USD: (Si deseas ingresarlo en miles de dolares puedes usa e3 al final de la cantidad, por ejemplo 100e3 serían 100,000 USD)", value = 0, min = 0),
+    br(),
+    selectInput("oridest_sector", "Selecciona el sector a invertir:", choices = SECTORS, width = "100%"),
+    numericInput("oridest_invest",
+      "Monto a invertir (USD):",
+      value = 0, min = 0, width = "100%"
+    ),
+    p(class = "text-muted", "Nota: Puede usar notación científica, ej: 100e3 = 100,000"),
+    hr(),
+    numeric_or_slider
   ),
+  # Panel 2: Mode Manual Shocks
   tabPanel(
     "mode_shocks",
+    h5("Ingreso Manual de Demandas (Millones MXN)"),
     fluidRow(
-      column(6, input_sectors_sinaloa),
-      column(6, input_sectors_mexico)
+      # Scrollable areas for the long list of sectors
+      column(6, tags$div(style = "height: 500px; overflow-y: auto; padding-right: 10px;", input_sectors_sinaloa)),
+      column(6, tags$div(style = "height: 500px; overflow-y: auto; padding-right: 10px;", input_sectors_mexico))
     )
-  ),
+  )
 )
 
 # UI ----
 
-ui <- fluidPage(
-  shinyFeedback::useShinyFeedback(),
-  h1("Calculadora Insumo Producto Sinaloa"),
-  p("
-    Incluye dos modos, el primer modo desgloza la inversión a traves de
-    las Matrices de Origen y Destino (https://www.inegi.org.mx/programas/tod/2018/#tabulados).
-    Este modo necesita el monto a invertir en USD y seleccionar en que sector se realizará la inversión.
-    Se puede hacer un desgloce más fino al especificar cuanto del capital se quedará dentro de Sinaloa y cuanto fuera.
-    El segundo modo da total control al permitir desglozar la inversión de cualquier manera.
-    IMPORTANTE: en este modo las cantidades a ingresar están en millones de pesos.
-    También se puede subir un archivo \".tsv\" con una columna llamada \"shocks_millones_mxn\",
-    por ejemplo un resultado anteriormente calculado y editado manualmente en programas de hoja de cálculo.
-    Al hacer esto los valores se ingresaran automáticamente en el Modo 2.
-    "),
-  sidebarLayout(
-    sidebarPanel(
-      select_mode,
-      textInput("experiment_name", "Nombre del Experimento"),
-      numericInput("tipo_cambio", "Tipo de Cambio MXN a USD", value = MXN_USD, min = 0)
-    ),
-    mainPanel(
-      uiOutput("totals"),
-      fileInput("uploaded", "Ingresar los shocks en millones de pesos a través de subir un archivo tsv:", accept = ".tsv"),
-      downloadButton("download", "Descargar Resultados")
-    ),
+ui <- bs4DashPage(
+  title = "Calculadora Insumo Producto",
+  dark = NULL,
+
+  # 1. Header
+  header = bs4DashNavbar(
+    title = dashboardBrand(
+      title = "MIP Sinaloa",
+      color = "primary",
+      href = "#",
+      image = "https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png"
+    )
   ),
-  mode_params,
-  uiOutput("splits"),
-  h1("Tabla de Resultados"),
-  DT::dataTableOutput("output_tab")
+
+  # 2. Sidebar
+  sidebar = bs4DashSidebar(
+    skin = "light",
+    status = "primary",
+    bs4SidebarMenu(
+      id = "sidebar_menu",
+      bs4SidebarHeader("Configuración General"),
+      div(
+        class = "px-3",
+        textInput("experiment_name", "Nombre del Experimento", placeholder = "Ej. Nueva Planta"),
+        numericInput("tipo_cambio", "Tipo de Cambio (MXN/USD)", value = MXN_USD, min = 0),
+        hr(),
+        select_mode[[1]], # Mode Selector
+        hr(),
+        select_mode[[2]] # Breakdown Selector
+      )
+    )
+  ),
+
+  # 3. Body
+  body = bs4DashBody(
+    shinyFeedback::useShinyFeedback(),
+
+    # Description / Helper Text (Collapsible)
+    bs4Card(
+      title = "Instrucciones",
+      status = "gray",
+      solidHeader = FALSE,
+      collapsible = TRUE,
+      collapsed = TRUE,
+      width = 12,
+      p("Incluye dos modos. El Modo 1 desglosa la inversión a través de las Matrices de Origen y Destino.
+        Este modo necesita el monto a invertir en USD y el sector.
+        El Modo 2 da total control manual (Millones de MXN).
+        También se puede subir un archivo '.tsv' con una columna 'shocks_millones_mxn'.")
+    ),
+
+    # Row 1: KPI / Totals (Value Boxes)
+    uiOutput("totals"),
+
+    # Row 2: Main Interaction Area
+    fluidRow(
+      # Left Column: Logic / Inputs
+      column(
+        width = 6,
+        bs4Card(
+          title = "Parámetros de Entrada",
+          status = "primary",
+          solidHeader = TRUE,
+          width = 12,
+          mode_params # The hidden tabset
+        )
+      ),
+
+      # Right Column: Regional Splits & Files
+      column(
+        width = 6,
+        # Only show Splits card if in Mode 1
+        conditionalPanel(
+          condition = glue("input.template_mode == '{MODE_ORIDEST}'"),
+          bs4Card(
+            title = "Distribución Regional (Sinaloa vs Resto)",
+            status = "info",
+            solidHeader = TRUE,
+            width = 12,
+            tags$div(
+              style = "max-height: 450px; overflow-y: auto;",
+              uiOutput("splits")
+            )
+          )
+        ),
+
+        # File Operations Card
+        bs4Card(
+          title = "Gestión de Archivos",
+          status = "secondary",
+          solidHeader = TRUE,
+          width = 12,
+          fileInput("uploaded", "Cargar archivo .tsv (Shocks MXN)", accept = ".tsv"),
+          downloadButton("download", "Descargar Resultados", class = "btn-success btn-block")
+        )
+      )
+    ),
+
+    # Row 3: Results Table
+    fluidRow(
+      column(
+        width = 12,
+        bs4Card(
+          title = "Tabla Detallada de Resultados",
+          status = "primary",
+          width = 12,
+          collapsible = TRUE,
+          DT::dataTableOutput("output_tab")
+        )
+      )
+    )
+  )
 )
 
 # server ----
@@ -170,6 +257,7 @@ server <- function(input, output, session) {
   })
 
   selected_structure <- reactive({
+    req(input$oridest_sector)
     SECTORS_STRUCTURE[, input$oridest_sector, drop = TRUE] |>
       set_names(SECTORS)
   })
@@ -178,17 +266,19 @@ server <- function(input, output, session) {
   output$splits <- renderUI({
     req(input$template_mode == MODE_ORIDEST)
 
-    slider_text <- "{str_to_upper(input$oridest_sector)}: {str_to_upper(sector)}
-                           El sector: <i>{input$oridest_sector}</i> demanda
-                           {round(input$oridest_invest * sector_struct,ROUND)} USD
-                            ({round(sector_struct*100,ROUND)}% de la inversión)
-                           del sector <i>{sector}</i>.
-                           ¿Qué porcentaje de esta inversión debería quedarse en Sinaloa?
-                           (el resto se iría a otros estados de la República)."
+    # Use HTML formatting for the label to make it readable in the dashboard
+    slider_text <- "<b>{str_to_upper(sector)}</b><br>
+    <small>Demanda: {format(round(input$oridest_invest * sector_struct, ROUND), big.mark=',')} USD
+    ({round(sector_struct*100, ROUND)}%)</small><br>
+    <i>% que se queda en Sinaloa:</i>"
 
     non_zero_sorted <- selected_structure() |>
       discard(~ near(.x, 0)) |>
-      sort(, decreasing = TRUE)
+      sort(decreasing = TRUE)
+
+    if (length(non_zero_sorted) == 0) {
+      return(div(class = "text-center", p("Este sector no genera demanda directa de insumos.")))
+    }
 
     if (input$numericORslider == MODE_SLIDER) {
       out <- non_zero_sorted |>
@@ -233,15 +323,19 @@ server <- function(input, output, session) {
   template <- reactive({
     Vshocks_millones_mxn <- shocks_millones_mxn()
 
+    # Conditional logic to handle NAs safely depending on mode
+    curr_oridest_sector <- if (input$template_mode == MODE_ORIDEST) input$oridest_sector else NA
+    curr_split <- if (input$template_mode == MODE_ORIDEST) captured_splits() else NA
+
     if (input$template_mode == MODE_ORIDEST) {
       out <- TEMPLATE |>
         mutate(
           experiment_name = input$experiment_name,
           date = Sys.time(),
-          use_origen_destino = input$template_mode == MODE_ORIDEST,
-          origen_destino_sector = input$oridest_sector,
+          use_origen_destino = TRUE,
+          origen_destino_sector = curr_oridest_sector,
           origen_destino_structure = rep(selected_structure(), 2),
-          split = captured_splits(),
+          split = curr_split,
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio,
           shocks_millones_mxn = Vshocks_millones_mxn
@@ -251,7 +345,7 @@ server <- function(input, output, session) {
         mutate(
           experiment_name = input$experiment_name,
           date = Sys.time(),
-          use_origen_destino = input$template_mode == MODE_ORIDEST,
+          use_origen_destino = FALSE,
           origen_destino_sector = NA,
           origen_destino_structure = NA,
           split = NA,
@@ -299,31 +393,28 @@ server <- function(input, output, session) {
 
 
   output$totals <- renderUI({
-    pib <- pib()
-    empleos <- empleos()$empleos
+    pib_val <- pib()
+    empleos_val <- empleos()$empleos
 
-    N <- length(pib)
+    N <- length(pib_val)
 
-    ui_value_box <- function(value, legend) {
-      bs4Dash::valueBox(
-        value = value |> sum() |> round(ROUND),
-        subtitle = legend
+    # Helper for bs4Dash value boxes
+    ui_value_box <- function(value, legend, icon_name, color) {
+      bs4ValueBox(
+        value = value |> sum() |> round(ROUND) |> format(big.mark = ","),
+        subtitle = legend,
+        icon = icon(icon_name),
+        color = color,
+        width = 12
       )
     }
 
-    list(
-      fluidRow(
-        column(6, ui_value_box(pib, "Impacto en el PIB en millones de pesos")),
-        column(6, ui_value_box(empleos, "Impacto en el número de empleos"))
-      ),
-      fluidRow(
-        column(6, ui_value_box(pib[1:(N / 2)], "Sinaloa:\nImpacto en el PIB en millones de pesos")),
-        column(6, ui_value_box(pib[(N / 2 + 1):N], "Resto del País:\nImpacto en el PIB en millones de pesos"))
-      ),
-      fluidRow(
-        column(6, ui_value_box(empleos[1:(N / 2)], "Sinaloa:\nImpacto en el número de empleos")),
-        column(6, ui_value_box(empleos[(N / 2 + 1):N], "Resto del País:\nImpacto en el número de empleos"))
-      )
+    # Layout using fluidRow/columns for the 4 boxes
+    fluidRow(
+      column(3, ui_value_box(pib_val, "Impacto PIB (MXN)", "money-bill-wave", "success")),
+      column(3, ui_value_box(empleos_val, "Impacto Empleos", "users", "primary")),
+      column(3, ui_value_box(pib_val[1:(N / 2)], "Sinaloa: PIB", "map-marker-alt", "info")),
+      column(3, ui_value_box(empleos_val[1:(N / 2)], "Sinaloa: Empleos", "user-tie", "info"))
     )
   })
 
@@ -335,13 +426,17 @@ server <- function(input, output, session) {
     content = function(file) write_tsv(results(), file)
   )
 
-  output$output_tab <- DT::renderDataTable({
-    results() |>
-      select(shocks_millones_mxn:last_col()) |>
-      select(-directos, -indirectos, -desbordamiento, -retroalimentacion)
-  })
+  output$output_tab <- DT::renderDataTable(
+    {
+      results() |>
+        select(shocks_millones_mxn:last_col()) |>
+        select(-any_of(c("directos", "indirectos", "desbordamiento", "retroalimentacion")))
+    },
+    options = list(scrollX = TRUE)
+  )
 
   observeEvent(captured_splits(), {
+    req(input$template_mode == MODE_ORIDEST)
     manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
     main_shocks_V <- main_shocks()
 
@@ -368,7 +463,7 @@ server <- function(input, output, session) {
 
   observeEvent(non_validated(), {
     uploaded <- non_validated()
-    rep(is_tibble(uploaded))
+    req(is_tibble(uploaded))
 
     n_sectors <- length(TEMPLATE$sector)
 
@@ -385,10 +480,10 @@ server <- function(input, output, session) {
     err_type <- glue("{SHOCKS_COL_NAME} NO es >= 0")
 
     # rstyler: off
-      if      (!correct_name) shinyFeedback::feedbackDanger("uploaded", TRUE, err_name)
-      else if (!correct_size) shinyFeedback::feedbackDanger("uploaded", TRUE, err_size)
-      else if (!correct_type) shinyFeedback::feedbackDanger("uploaded", TRUE, err_type)
-      else shinyFeedback::feedbackSuccess("uploaded", TRUE, "Carga Completada")
+    if      (!correct_name) shinyFeedback::feedbackDanger("uploaded", TRUE, err_name)
+    else if (!correct_size) shinyFeedback::feedbackDanger("uploaded", TRUE, err_size)
+    else if (!correct_type) shinyFeedback::feedbackDanger("uploaded", TRUE, err_type)
+    else shinyFeedback::feedbackSuccess("uploaded", TRUE, "Carga Completada")
     # rstyler: on
   })
 
@@ -396,7 +491,7 @@ server <- function(input, output, session) {
 
   uploaded_shocks <- reactive({
     uploaded <- non_validated()
-    rep(is_tibble(uploaded))
+    req(is_tibble(uploaded))
 
     n_sectors <- length(TEMPLATE$sector)
 
@@ -415,7 +510,7 @@ server <- function(input, output, session) {
 
 
   observeEvent(uploaded_shocks(), {
-    updateSelectInput(
+    updateRadioButtons(
       session = session,
       inputId = "template_mode",
       selected = MODE_SHOCKS
