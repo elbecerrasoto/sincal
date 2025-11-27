@@ -60,7 +60,7 @@ stopifnot(
 # UI helpers ----
 
 select_mode <- list(
-  radioButtons("template_mode",
+  radioButtons("mode",
     "Modo de Operación:",
     choiceNames = c(
       "Modo 1: Inversión (Origen/Destino)",
@@ -208,7 +208,7 @@ ui <- bs4DashPage(
         width = 6,
         # Only show Splits card if in Mode 1
         conditionalPanel(
-          condition = glue("input.template_mode == '{MODE_ORIDEST}'"),
+          condition = glue("input.mode == '{MODE_ORIDEST}'"),
           bs4Card(
             title = "Distribución Regional (Sinaloa vs Resto)",
             status = "info",
@@ -252,8 +252,8 @@ ui <- bs4DashPage(
 # server ----
 
 server <- function(input, output, session) {
-  observeEvent(input$template_mode, {
-    updateTabsetPanel(inputId = "mode_params", selected = input$template_mode)
+  observeEvent(input$mode, {
+    updateTabsetPanel(inputId = "mode_params", selected = input$mode)
   })
 
   selected_structure <- reactive({
@@ -264,7 +264,7 @@ server <- function(input, output, session) {
 
 
   output$splits <- renderUI({
-    req(input$template_mode == MODE_ORIDEST)
+    req(input$mode == MODE_ORIDEST)
 
     # Use HTML formatting for the label to make it readable in the dashboard
     slider_text <- "<b>{str_to_upper(sector)}</b><br>
@@ -294,7 +294,7 @@ server <- function(input, output, session) {
 
 
   captured_splits <- reactive({
-    req(input$template_mode == MODE_ORIDEST)
+    req(input$mode == MODE_ORIDEST)
 
     splits_sin <- rep(0, length(SECTORS)) |> set_names(SECTORS)
 
@@ -310,7 +310,7 @@ server <- function(input, output, session) {
   })
 
   shocks_millones_mxn <- reactive({
-    if (input$template_mode == MODE_ORIDEST) {
+    if (input$mode == MODE_ORIDEST) {
       out <- captured_splits() * selected_structure() * input$tipo_cambio * input$oridest_invest / MIP_SCALE
     } else {
       sectors70 <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
@@ -321,24 +321,20 @@ server <- function(input, output, session) {
 
 
   template <- reactive({
-    Vshocks_millones_mxn <- shocks_millones_mxn()
+    shocks_millones_mxn_V <- shocks_millones_mxn()
 
-    # Conditional logic to handle NAs safely depending on mode
-    curr_oridest_sector <- if (input$template_mode == MODE_ORIDEST) input$oridest_sector else NA
-    curr_split <- if (input$template_mode == MODE_ORIDEST) captured_splits() else NA
-
-    if (input$template_mode == MODE_ORIDEST) {
+    if (input$mode == MODE_ORIDEST) {
       out <- TEMPLATE |>
         mutate(
           experiment_name = input$experiment_name,
           date = Sys.time(),
           use_origen_destino = TRUE,
-          origen_destino_sector = curr_oridest_sector,
+          origen_destino_sector = input$oridest_sector,
           origen_destino_structure = rep(selected_structure(), 2),
-          split = curr_split,
+          split = captured_splits(),
           investment_usd = input$oridest_invest,
           exrate = input$tipo_cambio,
-          shocks_millones_mxn = Vshocks_millones_mxn
+          shocks_millones_mxn = shocks_millones_mxn_V
         )
     } else {
       out <- TEMPLATE |>
@@ -349,9 +345,9 @@ server <- function(input, output, session) {
           origen_destino_sector = NA,
           origen_destino_structure = NA,
           split = NA,
-          investment_usd = sum(Vshocks_millones_mxn) * MIP_SCALE / input$tipo_cambio,
+          investment_usd = sum(shocks_millones_mxn_V) * MIP_SCALE / input$tipo_cambio,
           exrate = input$tipo_cambio,
-          shocks_millones_mxn = Vshocks_millones_mxn
+          shocks_millones_mxn = shocks_millones_mxn_V
         )
     }
     out
@@ -363,12 +359,12 @@ server <- function(input, output, session) {
 
   # Main Calculation
   pib <- reactive({
-    SINALOA$L %*% main_shocks() |> as.double()
+    SINALOA$L %*% shocks_millones_mxn() |> as.double()
   })
 
   # Main Calculation
   empleos <- reactive({
-    map(TSIN_ALL, \(M) M %*% main_shocks() |> as.double()) |>
+    map(TSIN_ALL, \(M) M %*% shocks_millones_mxn() |> as.double()) |>
       as_tibble()
   })
 
@@ -436,13 +432,13 @@ server <- function(input, output, session) {
   )
 
   observeEvent(captured_splits(), {
-    req(input$template_mode == MODE_ORIDEST)
+    req(input$mode == MODE_ORIDEST)
     manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-    main_shocks_V <- main_shocks()
+    shocks_millones_mxn_V <- shocks_millones_mxn()
 
     for (idx in seq_along(manual_shocks_ids)) {
       input_id <- manual_shocks_ids[[idx]]
-      new_value <- main_shocks_V[[idx]]
+      new_value <- shocks_millones_mxn_V[[idx]]
 
       updateNumericInput(
         session = session,
@@ -512,7 +508,7 @@ server <- function(input, output, session) {
   observeEvent(uploaded_shocks(), {
     updateRadioButtons(
       session = session,
-      inputId = "template_mode",
+      inputId = "mode",
       selected = MODE_SHOCKS
     )
   })
