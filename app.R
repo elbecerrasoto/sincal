@@ -404,7 +404,7 @@ server <- function(input, output, session) {
 
     # Layout using fluidRow/columns for the 4 boxes
     fluidRow(
-      column(3, ui_value_box(pib_val, "Impacto PIB (MXN)", "money-bill-wave", "success")),
+      column(3, ui_value_box(pib_val, "Impacto PIB (Millones MXN)", "money-bill-wave", "success")),
       column(3, ui_value_box(empleos_val, "Impacto Empleos", "users", "primary")),
       column(3, ui_value_box(pib_val[1:(N / 2)], "Sinaloa: PIB", "map-marker-alt", "info")),
       column(3, ui_value_box(empleos_val[1:(N / 2)], "Sinaloa: Empleos", "user-tie", "info"))
