@@ -429,10 +429,6 @@ server <- function(input, output, session) {
   )
 
 
-
-
-
-
   non_validated <- reactive({
     req(input$uploaded)
     path <- input$uploaded$datapath
@@ -518,7 +514,6 @@ server <- function(input, output, session) {
     shocks_millones_mxn() |>
       update_manual_shocks()
   })
-
 
 
   observeEvent(uploaded_shocks(), {
