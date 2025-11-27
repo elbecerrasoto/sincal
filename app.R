@@ -353,9 +353,6 @@ server <- function(input, output, session) {
     out
   })
 
-  main_shocks <- reactive({
-    template()$shocks_millones_mxn
-  })
 
   # Main Calculation
   pib <- reactive({
@@ -431,22 +428,9 @@ server <- function(input, output, session) {
     options = list(scrollX = TRUE)
   )
 
-  observeEvent(captured_splits(), {
-    req(input$mode == MODE_ORIDEST)
-    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-    shocks_millones_mxn_V <- shocks_millones_mxn()
 
-    for (idx in seq_along(manual_shocks_ids)) {
-      input_id <- manual_shocks_ids[[idx]]
-      new_value <- shocks_millones_mxn_V[[idx]]
 
-      updateNumericInput(
-        session = session,
-        inputId = input_id,
-        value = new_value
-      )
-    }
-  })
+
 
 
   non_validated <- reactive({
@@ -513,13 +497,13 @@ server <- function(input, output, session) {
     )
   })
 
-  observeEvent(uploaded_shocks(), {
-    manual_shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
-    main_shocks_V <- uploaded_shocks()
 
-    for (idx in seq_along(manual_shocks_ids)) {
-      input_id <- manual_shocks_ids[[idx]]
-      new_value <- main_shocks_V[[idx]]
+  update_manual_shocks <- function(new_shocks) {
+    shocks_ids <- c(str_c(SECTORS, "_sinaloa"), str_c(SECTORS, "_mexico"))
+
+    for (idx in seq_along(shocks_ids)) {
+      input_id <- shocks_ids[[idx]]
+      new_value <- new_shocks[[idx]]
 
       updateNumericInput(
         session = session,
@@ -527,6 +511,20 @@ server <- function(input, output, session) {
         value = new_value
       )
     }
+  }
+
+  observeEvent(captured_splits(), {
+    req(input$mode == MODE_ORIDEST)
+    shocks_millones_mxn() |>
+      update_manual_shocks()
+  })
+
+
+
+  observeEvent(uploaded_shocks(), {
+    req(input$mode == MODE_ORIDEST)
+    uploaded_shocks() |>
+      update_manual_shocks()
   })
 }
 
