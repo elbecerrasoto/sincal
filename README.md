@@ -2,7 +2,7 @@
 
 **SinCal** is an interactive R Shiny dashboard designed to simulate and analyze economic impacts in the state of Sinaloa, Mexico. Using a Bi-Regional Input-Output Model (Sinaloa vs. Rest of Mexico), the application calculates how changes in final demand (shocks) affect Gross Value Added (PIB) and Employment.
 
-[Image of Leontief input output model diagram]
+For a live version you can check: [LiveApp](https://salsero-endemoniado.shinyapps.io/sincal/)
 
 ## 📋 Overview
 

@@ -144,7 +144,7 @@ ui <- bs4DashPage(
     title = dashboardBrand(
       title = "MIP Sinaloa",
       color = "primary",
-      href = "#",
+      href = "https://github.com/elbecerrasoto/sincal", # URL ADDED HERE
       image = "https://adminlte.io/themes/v3/dist/img/AdminLTELogo.png"
     )
   ),
