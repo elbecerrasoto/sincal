@@ -19,7 +19,7 @@ MXN_USD <- 18.5 # Exchange rate MXN to USD
 ROUND <- 2 # Rounding of numbers for printing
 MIP_SCALE <- 1e6 # The scale input of the MIP, in this case millions of MXN
 
-# Leontieff Stuff
+# Leontief Stuff
 # Note: get_ZAB_LG_fx_Madds is likely in helper.R (sourced by app_helper.R)
 SINALOA <- read_tsv(MIP_PATH) |>
   get_ZAB_LG_fx_Madds()

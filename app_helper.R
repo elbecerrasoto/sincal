@@ -1,5 +1,5 @@
 library(glue)
-source("leontieff.R")
+source("leontief.R")
 
 get_employment_matrices <- function(employment, sinaloa) {
   etype <- names(employment)[4:length(employment)]
