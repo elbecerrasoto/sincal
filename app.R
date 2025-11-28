@@ -1,9 +1,11 @@
 library(shiny)
 library(tidyverse)
 library(glue)
-library(DT)
 library(bs4Dash)
-library(shinyFeedback)
+# library(DT)
+# library(shinyFeedback)
+# library(openxlsx)
+# library(tools)
 
 # Load your helper functions
 source("app_helper.R")
@@ -183,7 +185,7 @@ ui <- bs4DashPage(
       p("Incluye dos modos. El Modo 1 desglosa la inversión a través de las Matrices de Origen y Destino.
         Este modo necesita el monto a invertir en USD y el sector.
         El Modo 2 da total control manual (Millones de MXN).
-        También se puede subir un archivo '.tsv' con una columna 'shocks_millones_mxn'.")
+        También se puede subir un archivo '.tsv' o '.xlsx' con una columna 'shocks_millones_mxn'.")
     ),
 
     # Row 1: KPI / Totals (Value Boxes)
@@ -227,7 +229,7 @@ ui <- bs4DashPage(
           status = "secondary",
           solidHeader = TRUE,
           width = 12,
-          fileInput("uploaded", "Cargar archivo .tsv (Shocks MXN)", accept = ".tsv"),
+          fileInput("uploaded", "Cargar archivo .tsv o .xlsx (Shocks MXN)", accept = c(".tsv", ".xlsx")),
           downloadButton("download", "Descargar Resultados", class = "btn-success btn-block")
         )
       )
@@ -433,12 +435,22 @@ server <- function(input, output, session) {
     req(input$uploaded)
     path <- input$uploaded$datapath
 
-    tryCatch(read_tsv(path), error = \(e) NULL)
+    read_app_input <- function(path) {
+      ext <- tools::file_ext(path)
+      switch(ext,
+        tsv = read_tsv(path),
+        xlsx = openxlsx::read.xlsx(path) |> as_tibble()
+      )
+    }
+
+    tryCatch(read_app_input(path), error = \(e) glue("{e}"))
   })
 
 
   observeEvent(non_validated(), {
     uploaded <- non_validated()
+
+    if (!is_tibble(uploaded)) shinyFeedback::feedbackDanger("uploaded", TRUE, "Error en la tabla")
     req(is_tibble(uploaded))
 
     n_sectors <- length(TEMPLATE$sector)
@@ -466,7 +478,10 @@ server <- function(input, output, session) {
 
 
   uploaded_shocks <- reactive({
+    msg <- "Error, por favor revisa tus datos de entrada"
     uploaded <- non_validated()
+    validate(need(is_tibble(uploaded), msg))
+
     req(is_tibble(uploaded))
 
     n_sectors <- length(TEMPLATE$sector)
@@ -478,7 +493,7 @@ server <- function(input, output, session) {
     correct_type <- is.numeric(uploaded_shocks) && all(uploaded_shocks >= 0)
 
     validate(
-      need(correct_name && correct_size && correct_type, "Error, por favor revisa tu datos de entrada")
+      need(correct_name && correct_size && correct_type, msg)
     )
 
     uploaded_shocks
