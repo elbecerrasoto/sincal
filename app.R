@@ -369,18 +369,19 @@ server <- function(input, output, session) {
 
   # Present the results
   results <- reactive({
+    template_V <- template()
     results_intermediate <- empleos() |>
       mutate(pib = pib()) |>
       relocate(pib)
 
     if (input$effect_breakdown == MODE_EFFECTS) {
-      breffects <- breakdown_results_into_effects(BIREGIONAL, results_intermediate)
-      out <- bind_cols(results_intermediate, BIREGIONAL, breffects)
+      out <- breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
+        left_join(template_V, join_by(scian, region))
     } else {
-      out <- bind_cols(results_intermediate, BIREGIONAL)
+      out <- bind_cols(template_V, results_intermediate, BIREGIONAL)
     }
 
-    bind_cols(template(), out)
+    out
   })
 
 
@@ -421,8 +422,10 @@ server <- function(input, output, session) {
   output$output_tab <- DT::renderDataTable(
     {
       results() |>
-        select(shocks_millones_mxn:last_col()) |>
-        select(-any_of(c("directos", "indirectos", "desbordamiento", "retroalimentacion")))
+        select(-any_of(c(
+          "directos", "indirectos", "desbordamiento", "retroalimentacion",
+          "experiment_name", "date", "use_origen_destino", "origen_destino_sector", "origen_destino_structure", "split", "investment_usd", "exrate"
+        )))
     },
     options = list(scrollX = TRUE)
   )

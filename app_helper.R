@@ -28,20 +28,50 @@ get_biregional <- function(sinaloa) {
   biregional_percents
 }
 
+breakdown_results_into_effects <- function(percents, totals, sector_info) {
+  add_cols <- function(x, efecto) {
+    x |>
+      mutate(
+        efecto = efecto,
+        scian = sector_info$scian,
+        region = sector_info$region,
+        sorting_col = row_number()
+      )
+  }
 
-breakdown_results_into_effects <- function(effects_percents, leontief_results) {
-  imap(
-    effects_percents,
-    function(brcol, brcol_name) {
-      leontief_results |>
-        mutate(across(
-          everything(),
-          ~ .x * brcol
-        )) |>
-        rename_with(~ paste0(brcol_name, "_", .x))
-    }
+  multiply_by_effect <- function(percent_col, totals) {
+    totals |>
+      mutate(across(
+        everything(),
+        \(pib) pib * percent_col
+      ))
+  }
+
+  efectos <- imap(
+    percents,
+    \(percent_col, percent_effect)
+    multiply_by_effect(percent_col, totals) |>
+      add_cols(percent_effect)
+  ) |> bind_rows()
+
+  results <- totals |>
+    add_cols("totales") |>
+    bind_rows(efectos)
+
+  results$efecto <- factor(results$efecto,
+    levels = c(
+      "totales", "directos",
+      "indirectos", "desbordamiento",
+      "retroalimentacion"
+    ), ordered = TRUE
   )
+
+  results |>
+    relocate(efecto, scian, region) |>
+    arrange(sorting_col, efecto) |>
+    select(-sorting_col)
 }
+
 
 get_sector_structure <- function(origen_destino_all) {
   origen_destino <- reduce(origen_destino_all, `+`)
