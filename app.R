@@ -368,7 +368,7 @@ server <- function(input, output, session) {
   })
 
   # Present the results
-  raw_results <- reactive({
+  results <- reactive({
     results_intermediate <- empleos() |>
       mutate(pib = pib()) |>
       relocate(pib)
@@ -379,11 +379,8 @@ server <- function(input, output, session) {
     } else {
       out <- bind_cols(results_intermediate, BIREGIONAL)
     }
-    out
-  })
 
-  results <- reactive({
-    bind_cols(template(), raw_results())
+    bind_cols(template(), out)
   })
 
 
