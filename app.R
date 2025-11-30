@@ -363,7 +363,8 @@ server <- function(input, output, session) {
       relocate(pib)
 
     breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
-      left_join(template_V, join_by(scian, region, ))
+      left_join(template_V, join_by(scian, region)) |>
+      relocate(experiment_name, efecto, scian, sector, region)
   })
 
 
@@ -404,8 +405,8 @@ server <- function(input, output, session) {
   output$output_tab <- DT::renderDataTable(
     {
       AVOID_CLUTTER <- c(
-        "experiment_name", "date", "use_origen_destino",
-        "origen_destino_sector", "origen_destino_structure", "split",
+        "date", "use_origen_destino", "origen_destino_sector",
+        "origen_destino_structure", "split",
         "investment_usd", "exrate"
       )
 
