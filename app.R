@@ -68,6 +68,14 @@ select_mode <- list(
       "Modo 2: Choques Manuales"
     ),
     choiceValues = c(MODE_ORIDEST, MODE_SHOCKS)
+  ),
+  radioButtons("effects", "Desglose de Resultados:",
+    choiceNames = c(
+      "Sí (Directos, Indirectos, etc.)",
+      "No (Solo totales)"
+    ),
+    choiceValues = c("yes", "no"),
+    selected = "no"
   )
 )
 
@@ -95,7 +103,6 @@ input_sectors_mexico <- SECTORS |>
     glue("RESTO PAÍS: {sector}"),
     value = 0, min = 0
   ))
-
 # The hidden logic panel (Wizard)
 mode_params <- tabsetPanel(
   id = "mode_params",
@@ -154,6 +161,8 @@ ui <- bs4DashPage(
         numericInput("tipo_cambio", "Tipo de Cambio (MXN/USD)", value = MXN_USD, min = 0),
         hr(),
         select_mode[[1]], # Mode Selector
+        hr(),
+        select_mode[[2]]
       )
     )
   ),
@@ -362,9 +371,15 @@ server <- function(input, output, session) {
       mutate(pib = pib()) |>
       relocate(pib)
 
-    breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
+    out <- breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
       left_join(template_V, join_by(scian, region)) |>
-      relocate(experiment_name, efecto, scian, sector, region)
+      relocate(experiment_name, efecto, scian, sector, region, shocks_millones_mxn)
+
+    if (input$effects == "yes") {
+      return(out)
+    } else {
+      return(out |> filter(efecto == "totales"))
+    }
   })
 
 
@@ -405,7 +420,7 @@ server <- function(input, output, session) {
   output$output_tab <- DT::renderDataTable(
     {
       AVOID_CLUTTER <- c(
-        "date", "use_origen_destino", "origen_destino_sector",
+        "experiment_name", "date", "use_origen_destino", "origen_destino_sector",
         "origen_destino_structure", "split",
         "investment_usd", "exrate"
       )
