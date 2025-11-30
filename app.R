@@ -14,7 +14,7 @@ source("app_helper.R")
 
 MIP_PATH <- "data/mip_sinaloa.tsv"
 EMPLOYMENT_PATH <- "data/empleos_impuestos.tsv"
-TEMPLATE_PATH <- "data/input_base.tsv"
+TEMPLATE_PATH <- "data/output_scheme.tsv"
 ORI_DEST_PATH <- "data/origen_destino.rds"
 
 MXN_USD <- 18.5 # Exchange rate MXN to USD
