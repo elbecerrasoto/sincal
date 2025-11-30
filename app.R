@@ -14,7 +14,7 @@ source("app_helper.R")
 
 MIP_PATH <- "data/mip_sinaloa.tsv"
 EMPLOYMENT_PATH <- "data/empleos_impuestos.tsv"
-TEMPLATE_PATH <- "data/output_scheme.tsv"
+TEMPLATE_PATH <- "data/input_scheme.tsv"
 ORI_DEST_PATH <- "data/origen_destino.rds"
 
 MXN_USD <- 18.5 # Exchange rate MXN to USD
@@ -46,7 +46,6 @@ SECTORS <- unique(TEMPLATE$sector)
 MODE_ORIDEST <- "mode_oridest" # Flag for Origen y Destino Mode
 MODE_SHOCKS <- "mode_shocks"
 MODE_SLIDER <- "slider" # Flag for Slider Activation
-MODE_EFFECTS <- "mode_effects" # Flag for adding the effects to the result table
 
 SECTORS_STRUCTURE <- read_rds(ORI_DEST_PATH) |>
   get_sector_structure() |>
@@ -69,15 +68,6 @@ select_mode <- list(
       "Modo 2: Choques Manuales"
     ),
     choiceValues = c(MODE_ORIDEST, MODE_SHOCKS)
-  ),
-  radioButtons("effect_breakdown",
-    "Desglose de Resultados:",
-    choiceNames = c(
-      "Sí (Directos, Indirectos, etc.)",
-      "No (Solo totales)"
-    ),
-    choiceValues = c(MODE_EFFECTS, glue("{MODE_EFFECTS}_NO")),
-    selected = glue("{MODE_EFFECTS}_NO")
   )
 )
 
@@ -164,8 +154,6 @@ ui <- bs4DashPage(
         numericInput("tipo_cambio", "Tipo de Cambio (MXN/USD)", value = MXN_USD, min = 0),
         hr(),
         select_mode[[1]], # Mode Selector
-        hr(),
-        select_mode[[2]] # Breakdown Selector
       )
     )
   ),
@@ -374,14 +362,8 @@ server <- function(input, output, session) {
       mutate(pib = pib()) |>
       relocate(pib)
 
-    if (input$effect_breakdown == MODE_EFFECTS) {
-      out <- breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
-        left_join(template_V, join_by(scian, region))
-    } else {
-      out <- bind_cols(template_V, results_intermediate, BIREGIONAL)
-    }
-
-    out
+    breakdown_results_into_effects(BIREGIONAL, results_intermediate, template_V) |>
+      left_join(template_V, join_by(scian, region, ))
   })
 
 
@@ -421,11 +403,14 @@ server <- function(input, output, session) {
 
   output$output_tab <- DT::renderDataTable(
     {
+      AVOID_CLUTTER <- c(
+        "experiment_name", "date", "use_origen_destino",
+        "origen_destino_sector", "origen_destino_structure", "split",
+        "investment_usd", "exrate"
+      )
+
       results() |>
-        select(-any_of(c(
-          "directos", "indirectos", "desbordamiento", "retroalimentacion",
-          "experiment_name", "date", "use_origen_destino", "origen_destino_sector", "origen_destino_structure", "split", "investment_usd", "exrate"
-        )))
+        select(-any_of(AVOID_CLUTTER))
     },
     options = list(scrollX = TRUE)
   )
